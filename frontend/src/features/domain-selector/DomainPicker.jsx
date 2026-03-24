@@ -25,7 +25,7 @@ const DOMAINS = [
   },
 ];
 
-const DomainPicker = ({ onSelect, loading }) => {
+const DomainPicker = ({ onSelect, creatingKey }) => {
     return (
         <>
             <div>
@@ -43,7 +43,7 @@ const DomainPicker = ({ onSelect, loading }) => {
                         key={domain.key}
                         domain={domain}
                         onSelect={onSelect}
-                        loading={loading}
+                        loading={creatingKey === domain.key}
                     />
                 ))}
             </div>

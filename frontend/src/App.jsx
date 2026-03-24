@@ -9,9 +9,7 @@ const App = () => {
 
   const [templateKey, setTemplateKey] = useState('custom');
   const [engineType, setEngineType] = useState('task');
-  const { createProject: createProjectMutation } = useProjects();
-
-  const isCreating = createProjectMutation.isLoading;
+  const { createProject: createProjectMutation, creatingKey } = useProjects();
 
   const handleTemplateSelect = (domain, selectedEngine) => {
     const engine = domain.engineLocked || selectedEngine;
@@ -19,10 +17,9 @@ const App = () => {
     createProjectMutation.mutate(
       { templateKey: domain.key, engineType: engine },
       {
-        onSuccess: (data) => {
+        onSuccess: () => {
           setTemplateKey(domain.key);
           setEngineType(engine);
-          console.log('Project created:', data);
         },
         onError: (err) => {
           console.error('Failed to create project:', err);
@@ -61,7 +58,7 @@ const App = () => {
         </header>
 
         <div className='p-6 max-w-6xl mx-auto mt-6'>
-          <DomainPicker onSelect={handleTemplateSelect} loading={isCreating} />
+          <DomainPicker onSelect={handleTemplateSelect} creatingKey={creatingKey} />
         </div>
       </div>
     </main>
