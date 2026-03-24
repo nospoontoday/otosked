@@ -14,6 +14,11 @@ api.interceptors.request.use(config => {
 });
 
 export const createProject = async (templateKey, engineType) => {
-    const r = await api.post('/projects', { templateKey, engineType });
-    return r.data;
-}
+    try {
+        const response = await api.post('/projects', { templateKey, engineType });
+        return response.data;
+    } catch (err) {
+        // TODO: transform error
+        throw err.response?.data || err;
+    }
+};

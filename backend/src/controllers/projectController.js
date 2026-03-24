@@ -2,6 +2,15 @@
 import Project from '../models/Project.js';
 import Template from '../models/Template.js';
 
+const index = async (_req, res) => {
+  try {
+    const projects = await Project.find().populate('template');
+    return res.status(200).json(projects);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+};
+
 const store = async (req, res) => {
   try {
     const { templateKey = 'custom', engineType = 'task', name } = req.body || {};
@@ -26,4 +35,4 @@ const store = async (req, res) => {
   }
 };
 
-export { store };
+export { index, store };

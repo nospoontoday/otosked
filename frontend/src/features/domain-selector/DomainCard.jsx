@@ -16,7 +16,7 @@ const ENGINES = [
   },
 ];
 
-const DomainCard = ({ domain, onSelect }) => {
+const DomainCard = ({ domain, onSelect, loading }) => {
   const [selectedEngine, setSelectedEngine] = useState('task');
 
   const handleSelect = (e) => {
@@ -57,7 +57,7 @@ const DomainCard = ({ domain, onSelect }) => {
           />
         )}
 
-        <PrimaryButton onClick={handleSelect} />
+        <PrimaryButton onClick={handleSelect} loading={loading} />
       </div>
     </div>
   );
@@ -100,15 +100,17 @@ const EngineSelector = ({ engines, selectedEngine, onChange }) => (
   </>
 );
 
-const PrimaryButton = ({ onClick }) => (
+const PrimaryButton = ({ onClick, loading }) => (
   <button
     type="button"
     onClick={onClick}
-    className="w-full flex items-center justify-center gap-2 
-               bg-indigo-600 text-white px-4 py-2.5 rounded-xl 
-               text-sm font-bold hover:bg-indigo-700 transition shadow-sm"
+    disabled={loading}
+    className={`w-full flex items-center justify-center gap-2 
+                bg-indigo-600 text-white px-4 py-2.5 rounded-xl 
+                text-sm font-bold transition shadow-sm
+                ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-indigo-700'}`}
   >
-    Get Started <ArrowRight className="w-4 h-4" />
+    {loading ? 'Creating...' : <>Get Started <ArrowRight className="w-4 h-4" /></>}
   </button>
 );
 

@@ -3,18 +3,34 @@ import {LogIn, Zap} from 'lucide-react'
 import DomainPicker from './features/domain-selector/DomainPicker'
 import { useState } from 'react';
 import { createProject } from './services/api';
+import { useProjects } from './hooks/useProjects';
 
 const App = () => {
 
   const [templateKey, setTemplateKey] = useState('custom');
   const [engineType, setEngineType] = useState('task');
+  const { createProject: createProjectMutation } = useProjects();
 
-  const handleTemplateSelect = async (domain, selectedEngine) => {
+  const isCreating = createProjectMutation.isLoading;
+
+  const handleTemplateSelect = (domain, selectedEngine) => {
     const engine = domain.engineLocked || selectedEngine;
-    const project = await createProject(domain.key, engine);
-    setTemplateKey(domain.key);
-    setEngineType(engine);
-  }
+
+    createProjectMutation.mutate(
+      { templateKey: domain.key, engineType: engine },
+      {
+        onSuccess: (data) => {
+          setTemplateKey(domain.key);
+          setEngineType(engine);
+          console.log('Project created:', data);
+        },
+        onError: (err) => {
+          console.error('Failed to create project:', err);
+          alert(err.message || 'Failed to create project');
+        },
+      }
+    );
+  };
 
   return (
     <main>
@@ -45,7 +61,7 @@ const App = () => {
         </header>
 
         <div className='p-6 max-w-6xl mx-auto mt-6'>
-          <DomainPicker onSelect={handleTemplateSelect} />
+          <DomainPicker onSelect={handleTemplateSelect} loading={isCreating} />
         </div>
       </div>
     </main>
