@@ -8,7 +8,7 @@ dotenv.config();
 const PORT = process.env.PORT || 5000;
 const API_VERSION = process.env.API_VERSION || 'v1';
 
-app.use(`/api/${API_VERSION}/projects`, projectRouter);
+// app.use(`/api/${API_VERSION}/projects`, projectRouter);
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 
 connectDB().then(() => {
