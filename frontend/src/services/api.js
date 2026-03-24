@@ -13,6 +13,7 @@ api.interceptors.request.use(config => {
   return config;
 });
 
-export function createProject(templateKey, engineType) {
-    return api.post('/projects', { templateKey, engineType }).then(r => r.data);
+export const createProject = async (templateKey, engineType) => {
+    const r = await api.post('/projects', { templateKey, engineType });
+    return r.data;
 }
