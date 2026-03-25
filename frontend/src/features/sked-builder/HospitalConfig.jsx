@@ -20,7 +20,6 @@ const HospitalConfig = ({ project }) => {
 
         const totalShifts = shiftsPerDay * 7 * duration;
 
-        // ✅ KEY CHANGE
         const effectiveShiftsPerWeek =
             shiftModel === '12h' ? shiftPerWeek : 5;
 

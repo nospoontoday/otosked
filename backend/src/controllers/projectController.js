@@ -28,6 +28,7 @@ const store = async (req, res) => {
       engineType,
       shiftModel: template.defaultShiftModel,
       shiftPerWeek: template.defaultShiftPerWeek,
+      shiftConfig: template.shiftConfigs.find(c => c.shiftModel === template.defaultShiftModel) || {},
       demandSlots: [],
     });
 
