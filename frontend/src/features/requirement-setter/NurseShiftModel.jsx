@@ -8,6 +8,8 @@ const NurseShiftModel = ({
     onShiftModelChange,
     onShiftPerWeekChange
 }) => {
+    const is12h = shiftModel === '12h';
+
     return (
         <div>
             <h3 className="font-semibold text-slate-800 mb-1 flex items-center gap-2">
@@ -18,6 +20,7 @@ const NurseShiftModel = ({
                 Defines the shift structure for nursing staff.
             </p>
 
+            {/* Shift model selector */}
             <select
                 value={shiftModel}
                 onChange={e => onShiftModelChange(e.target.value)}
@@ -30,26 +33,36 @@ const NurseShiftModel = ({
                 ))}
             </select>
 
-            <div className="mt-2 flex items-center gap-2 flex-wrap">
-                <label className="text-[11px] font-medium text-slate-500">
-                    Shifts per week:
-                </label>
+            {/* ✅ Only show if 12h */}
+            {is12h && (
+                <div className="mt-2 flex items-center gap-2 flex-wrap">
+                    <label className="text-[11px] font-medium text-slate-500">
+                        Shifts per week:
+                    </label>
 
-                {shiftPerWeekOptions.map(option => (
-                    <button
-                        key={option.value}
-                        onClick={() => onShiftPerWeekChange(option.value)}
-                        className={`px-2.5 py-1 rounded-lg text-[11px] font-medium border transition ${
-                            shiftPerWeek === option.value
-                                ? 'bg-indigo-600 text-white border-indigo-600'
-                                : 'bg-white text-slate-500 border-slate-200'
-                        }`}
-                    >
-                        {option.label}
-                    </button>
-                ))}
-            </div>
+                    {shiftPerWeekOptions.map(option => (
+                        <button
+                            key={option.value}
+                            onClick={() => onShiftPerWeekChange(option.value)}
+                            className={`px-2.5 py-1 rounded-lg text-[11px] font-medium border transition ${
+                                shiftPerWeek === option.value
+                                    ? 'bg-indigo-600 text-white border-indigo-600'
+                                    : 'bg-white text-slate-500 border-slate-200'
+                            }`}
+                        >
+                            {option.label}
+                        </button>
+                    ))}
+                </div>
+            )}
+
+            {!is12h && (
+                <p className="mt-2 text-[11px] text-slate-400">
+                    8-hour model uses 3 shifts/day (21 shifts/week total).
+                </p>
+            )}
         </div>
     )
 }
+
 export default NurseShiftModel

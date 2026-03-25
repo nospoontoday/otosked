@@ -1,15 +1,41 @@
+import { useState, useEffect } from "react";
 import SkedDuration from "../requirement-setter/SkedDuration"
 import NurseShiftModel from "../requirement-setter/NurseShiftModel"
-import { useState } from "react"
 
 const HospitalConfig = ({ project }) => {
-    const [shiftModel, setShiftModel] = useState(project.shiftModel || project.template.defaultShiftModel);
-    const [shiftPerWeek, setShiftPerWeek] = useState(project.shiftPerWeek || 3);
-    const [duration, setDuration] = useState(project.template.duration || 1);
+    const [shiftModel, setShiftModel] = useState(
+        project.shiftModel || project.template.defaultShiftModel
+    );
+
+    const [shiftPerWeek, setShiftPerWeek] = useState(
+        project.shiftPerWeek || 3
+    );
+
+    const [duration, setDuration] = useState(
+        project.template.duration || 1
+    );
+
+    useEffect(() => {
+        const shiftsPerDay = shiftModel === '12h' ? 2 : 3;
+
+        const totalShifts = shiftsPerDay * 7 * duration;
+
+        // ✅ KEY CHANGE
+        const effectiveShiftsPerWeek =
+            shiftModel === '12h' ? shiftPerWeek : 5;
+
+        const shiftsPerNurse = effectiveShiftsPerWeek * duration;
+
+        const nursesNeeded = Math.ceil(totalShifts / shiftsPerNurse);
+
+    }, [shiftModel, shiftPerWeek, duration]);
 
     return (
         <div className="space-y-5">
-            <SkedDuration duration={duration} onDurationChange={setDuration} />
+            <SkedDuration 
+                duration={duration} 
+                onDurationChange={setDuration} 
+            />
 
             <NurseShiftModel
                 shiftModel={shiftModel}
