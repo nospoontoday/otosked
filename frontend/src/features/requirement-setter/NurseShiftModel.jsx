@@ -9,6 +9,7 @@ const NurseShiftModel = ({
     onShiftModelChange,
     onShiftPerWeekChange,
     timeSlots = [],
+    onTimeSlotsChange,
 }) => {
     const is12h = shiftModel === '12h';
     const modelDuration = is12h ? 12 : 8;
@@ -68,7 +69,7 @@ const NurseShiftModel = ({
             <ShiftDefinitions
                 timeSlots={timeSlots}
                 modelDuration={modelDuration}
-                // onUpdate={onUpdateShiftSlot}
+                onTimeSlotsChange={onTimeSlotsChange}
             />
         </div>
     )

@@ -15,9 +15,24 @@ const HospitalConfig = ({ project }) => {
         project.template.duration || 1
     );
 
-    const timeSlots = project.template.shiftConfigs.find(
-        c => c.shiftModel === shiftModel
-    )?.timeSlots || [];
+    const [timeSlots, setTimeSlots] = useState(() => {
+        return project.template.shiftConfigs.find(
+            c => c.shiftModel === (project.shiftModel || project.template.defaultShiftModel)
+        )?.timeSlots || [];
+    });
+
+    useEffect(() => {
+        const config = project.template.shiftConfigs.find(
+            c => c.shiftModel === shiftModel
+        );
+        if (config?.timeSlots) {
+            setTimeSlots(config.timeSlots);
+        }
+    }, [shiftModel, project.template.shiftConfigs]);
+
+    const handleTimeSlotsChange = (newSlots) => {
+        setTimeSlots(newSlots);
+    };
 
     useEffect(() => {
         const shiftsPerDay = timeSlots.length;
@@ -27,11 +42,9 @@ const HospitalConfig = ({ project }) => {
         const effectiveShiftsPerWeek =
             shiftModel === '12h' ? shiftPerWeek : 5;
 
-        const restDays = 7 - effectiveShiftsPerWeek;
-
         const shiftsPerNurse = effectiveShiftsPerWeek * duration;
 
-        const nursesNeeded = Math.ceil(totalShifts / shiftsPerNurse);
+        Math.ceil(totalShifts / shiftsPerNurse);
 
         console.log(timeSlots);
 
@@ -52,6 +65,7 @@ const HospitalConfig = ({ project }) => {
                 onShiftModelChange={setShiftModel}
                 onShiftPerWeekChange={setShiftPerWeek}
                 timeSlots={timeSlots}
+                onTimeSlotsChange={handleTimeSlotsChange}
             />
         </div>
     )
