@@ -19,6 +19,7 @@ const projectSchema = new mongoose.Schema({
   engineType: { type: String, enum: ['task', 'demandSlot'], default: 'task' },
   shiftModel: { type: String, required: true},
   shiftPerWeek: { type: Number, required: true },
+  restDays: { type: Number, required: true, default: 0 },
   timeSlots: [timeSlotSchema],
   demandSlots: [demandSlotSchema],
 }, { timestamps: true });

@@ -27,11 +27,11 @@ const HospitalConfig = ({ project }) => {
         const effectiveShiftsPerWeek =
             shiftModel === '12h' ? shiftPerWeek : 5;
 
+        const restDays = 7 - effectiveShiftsPerWeek;
+
         const shiftsPerNurse = effectiveShiftsPerWeek * duration;
 
         const nursesNeeded = Math.ceil(totalShifts / shiftsPerNurse);
-
-        console.log("TIMESLOTS", timeSlots);
 
     }, [shiftModel, shiftPerWeek, duration, timeSlots]);
 
