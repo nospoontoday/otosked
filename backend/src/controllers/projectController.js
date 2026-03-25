@@ -24,8 +24,10 @@ const store = async (req, res) => {
 
     const project = await Project.create({
       name: name || `${templateKey} project`,
-      template: template._id, // store reference
+      template: template._id,
       engineType,
+      shiftModel: template.defaultShiftModel,
+      shiftPerWeek: template.defaultShiftPerWeek,
       demandSlots: [],
     });
 

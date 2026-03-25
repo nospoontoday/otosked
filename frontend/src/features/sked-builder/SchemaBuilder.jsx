@@ -2,7 +2,7 @@ import { ChevronRight } from "lucide-react";
 import HospitalConfig from "./HospitalConfig";
 import SchoolConfig from "./SchoolConfig";
 
-const SchemaBuilder = ({templateKey}) => {
+const SchemaBuilder = ({templateKey, project}) => {
     const isUniversity = templateKey === 'university';
     const isHospital = templateKey === 'hospital';
 
@@ -38,7 +38,7 @@ const SchemaBuilder = ({templateKey}) => {
             <div className="flex flex-col md:flex-row min-h-[500px]">
                 <div className="w-full md:w-1/3 bg-slate-50 border-r border-slate-200 p-6 flex flex-col gap-6 max-h-[80vh] overflow-y-auto">
                     {isHospital ? (
-                        <HospitalConfig />
+                        <HospitalConfig project={project} />
                     ) : (
                         <SchoolConfig />
                     )}

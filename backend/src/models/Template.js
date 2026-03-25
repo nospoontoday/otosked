@@ -82,6 +82,30 @@ const subjectAssignmentSchema = new mongoose.Schema({
     allowedTeacherIds: { type: [String], default: [] },
 }, { _id: false });
 
+const shiftModelSchema = new mongoose.Schema({
+  value: { 
+    type: String, 
+    enum: ['12h', '8h'], 
+    required: true 
+  },
+  label: { 
+    type: String, 
+    required: true 
+  },
+}, { _id: false });
+
+const shiftPerWeekOptionSchema = new mongoose.Schema({
+    value: { 
+        type: Number, 
+        enum: [3, 4], 
+        required: true 
+    },
+    label: { 
+        type: String, 
+        required: true 
+    },
+}, { _id: false });
+
 const templateSchema = new mongoose.Schema({
     key: { type: String, required: true, unique: true},
     name: { type: String, required: true },
@@ -90,6 +114,36 @@ const templateSchema = new mongoose.Schema({
     resourceTypes: [resourceTypeSchema],
     timeSlots: [timeSlotSchema],
     resources: [resourceSchema],
+
+    shiftModels: {
+        type: [shiftModelSchema],
+        default: [
+            { value: '12h', label: '12-Hour Shift Model' },
+            { value: '8h', label: '8-Hour Shift Model' },
+        ],
+    },
+
+    shiftPerWeekOptions: {
+        type: [shiftPerWeekOptionSchema],
+        default: [
+            { value: 3, label: '3 Shifts per week (36h/wk)' },
+            { value: 4, label: '4 Shifts per week (48h/wk)' },
+        ],
+    },
+
+    defaultShiftModel: {
+        type: String,
+        enum: ['12h', '8h'],
+        default: '12h',
+    },
+
+    defaultShiftPerWeek: {
+        type: Number,
+        enum: [3, 4],
+        default: 3,
+    },
+
+    duration: { type: Number, default: 1 },
     tasks: [taskSchema],
     subjects: [subjectSchema],
     subjectAssignments: [subjectAssignmentSchema],
