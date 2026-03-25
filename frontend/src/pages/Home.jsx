@@ -2,6 +2,7 @@ import { LogIn, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import DomainPicker from '../features/domain-selector/DomainPicker';
+import Header from '../components/Header';
 import { useProjects } from '../hooks/useProjects';
 
 const Home = () => {
@@ -39,32 +40,34 @@ const Home = () => {
   return (
     <main>
       <div className="wrapper">
-        {/* Header */}
-        <header className="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between sticky top-0 z-10">
-          <div
-            className="flex items-center gap-2 text-indigo-600 cursor-pointer"
-            onClick={() => navigate('/')}
-          >
-            <h1 className="text-xl font-bold tracking-tight">
-              Nexus <span className="text-slate-400 font-medium">AutoScheduler</span>
-            </h1>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {/* Credits */}
-            <div className="flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-full text-xs font-medium text-slate-600">
-              <Zap className="w-3.5 h-3.5 text-amber-500" />
-              <span>100</span>
-              <span className="text-slate-400">/ 100</span>
+        <Header
+          left={
+            <div
+              className="flex items-center gap-2 text-indigo-600 cursor-pointer"
+              onClick={() => navigate('/')}
+            >
+              <h1 className="text-xl font-bold tracking-tight">
+                Nexus <span className="text-slate-400 font-medium">AutoScheduler</span>
+              </h1>
             </div>
+          }
+          right={
+            <div className="flex items-center gap-3">
+              {/* Credits */}
+              <div className="flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-full text-xs font-medium text-slate-600">
+                <Zap className="w-3.5 h-3.5 text-amber-500" />
+                <span>100</span>
+                <span className="text-slate-400">/ 100</span>
+              </div>
 
-            {/* Sign In */}
-            <button className="flex items-center gap-1.5 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700 transition shadow-sm">
-              <LogIn className="w-4 h-4" />
-              Sign In
-            </button>
-          </div>
-        </header>
+              {/* Sign In */}
+              <button className="flex items-center gap-1.5 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700 transition shadow-sm">
+                <LogIn className="w-4 h-4" />
+                Sign In
+              </button>
+            </div>
+          }
+        />
 
         {/* Content */}
         <div className="p-6 max-w-6xl mx-auto mt-6">

@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
 import { useProject } from '../hooks/useProjects';
+import Header from '../components/Header';
 import SchemaBuilder from '../features/sked-builder/SchemaBuilder';
 
 const ProjectPage = () => {
@@ -58,22 +59,24 @@ const ProjectPage = () => {
   return (
     <main>
       <div className="wrapper">
-        {/* Header */}
-        <header className="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between sticky top-0 z-10">
-          <div
-            className="flex items-center gap-2 text-indigo-600 cursor-pointer"
-            onClick={() => navigate('/')}
-          >
-            <ArrowLeft className="w-5 h-5" />
-            <h1 className="text-lg font-bold tracking-tight">
-              Back
-            </h1>
-          </div>
-
-          <div className="text-sm text-slate-500">
-            Project ID: <span className="font-mono">{id}</span>
-          </div>
-        </header>
+        <Header
+          left={
+            <div
+              className="flex items-center gap-2 text-indigo-600 cursor-pointer"
+              onClick={() => navigate('/')}
+            >
+              <ArrowLeft className="w-5 h-5" />
+              <h1 className="text-lg font-bold tracking-tight">
+                Back
+              </h1>
+            </div>
+          }
+          right={
+            <div className="text-sm text-slate-500">
+              Project ID: <span className="font-mono">{id}</span>
+            </div>
+          }
+        />
 
         {/* Content */}
         <div className="p-6 max-w-6xl mx-auto mt-6">
