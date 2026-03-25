@@ -6,7 +6,7 @@ const NurseShiftModel = ({
     shiftModels = [],
     shiftPerWeekOptions = [],
     onShiftModelChange,
-    onShiftPerWeekChange
+    onShiftPerWeekChange,
 }) => {
     const is12h = shiftModel === '12h';
 
@@ -33,7 +33,6 @@ const NurseShiftModel = ({
                 ))}
             </select>
 
-            {/* ✅ Only show if 12h */}
             {is12h && (
                 <div className="mt-2 flex items-center gap-2 flex-wrap">
                     <label className="text-[11px] font-medium text-slate-500">

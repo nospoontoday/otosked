@@ -15,8 +15,12 @@ const HospitalConfig = ({ project }) => {
         project.template.duration || 1
     );
 
+    const timeSlots = project.template.shiftConfigs.find(
+        c => c.shiftModel === shiftModel
+    )?.timeSlots || [];
+
     useEffect(() => {
-        const shiftsPerDay = shiftModel === '12h' ? 2 : 3;
+        const shiftsPerDay = timeSlots.length;
 
         const totalShifts = shiftsPerDay * 7 * duration;
 
@@ -27,7 +31,9 @@ const HospitalConfig = ({ project }) => {
 
         const nursesNeeded = Math.ceil(totalShifts / shiftsPerNurse);
 
-    }, [shiftModel, shiftPerWeek, duration]);
+        console.log("TIMESLOTS", timeSlots);
+
+    }, [shiftModel, shiftPerWeek, duration, timeSlots]);
 
     return (
         <div className="space-y-5">
