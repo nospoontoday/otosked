@@ -1,4 +1,5 @@
 import { Clock } from "lucide-react"
+import ShiftDefinitions from "./ShiftDefinitions";
 
 const NurseShiftModel = ({
     shiftModel,
@@ -7,8 +8,10 @@ const NurseShiftModel = ({
     shiftPerWeekOptions = [],
     onShiftModelChange,
     onShiftPerWeekChange,
+    timeSlots = [],
 }) => {
     const is12h = shiftModel === '12h';
+    const modelDuration = is12h ? 12 : 8;
 
     return (
         <div>
@@ -60,6 +63,13 @@ const NurseShiftModel = ({
                     8-hour model uses 3 shifts/day (21 shifts/week total).
                 </p>
             )}
+
+            {/* Editable shift definitions */}
+            <ShiftDefinitions
+                timeSlots={timeSlots}
+                modelDuration={modelDuration}
+                // onUpdate={onUpdateShiftSlot}
+            />
         </div>
     )
 }

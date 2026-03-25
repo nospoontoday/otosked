@@ -19,6 +19,8 @@ export const timeSlotSchema = new mongoose.Schema({
     id: { type: String, required: true },
     label: { type: String, required: true },
     duration: { type: Number, default: 1 },
+    start: { type: String, default: '08:00' },
+    end: { type: String, default: '16:00' },
 }, { _id: false });
 
 const shiftConfigSchema = new mongoose.Schema({
@@ -132,16 +134,16 @@ const templateSchema = new mongoose.Schema({
             {
             shiftModel: '12h',
             timeSlots: [
-                { id: 'day', label: 'Day Shift', duration: 12 },
-                { id: 'night', label: 'Night Shift', duration: 12 },
+                { id: 'day', label: 'Day Shift', duration: 12, start: 7, end: 19 },
+                { id: 'night', label: 'Night Shift', duration: 12, start: 19, end: 7 },
             ],
             },
             {
             shiftModel: '8h',
             timeSlots: [
-                { id: 'morning', label: 'Morning Shift', duration: 8 },
-                { id: 'evening', label: 'Evening Shift', duration: 8 },
-                { id: 'night', label: 'Night Shift', duration: 8 },
+                { id: 'morning', label: 'Morning Shift', duration: 8, start: 7, end: 15 },
+                { id: 'evening', label: 'Evening Shift', duration: 8, start: 15, end: 23 },
+                { id: 'night', label: 'Night Shift', duration: 8, start: 23, end: 7 },
             ],
             },
         ],

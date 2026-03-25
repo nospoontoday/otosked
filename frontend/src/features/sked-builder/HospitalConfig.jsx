@@ -33,6 +33,8 @@ const HospitalConfig = ({ project }) => {
 
         const nursesNeeded = Math.ceil(totalShifts / shiftsPerNurse);
 
+        console.log(timeSlots);
+
     }, [shiftModel, shiftPerWeek, duration, timeSlots]);
 
     return (
@@ -49,6 +51,7 @@ const HospitalConfig = ({ project }) => {
                 shiftPerWeekOptions={project.template.shiftPerWeekOptions}
                 onShiftModelChange={setShiftModel}
                 onShiftPerWeekChange={setShiftPerWeek}
+                timeSlots={timeSlots}
             />
         </div>
     )
