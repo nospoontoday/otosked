@@ -22,13 +22,19 @@ const store = async (req, res) => {
       return res.status(404).json({ error: 'Template not found: ' + templateKey });
     }
 
+    const defaultShiftConfig = template.shiftConfigs.find(
+      c => c.shiftModel === template.defaultShiftModel
+    );
+
+    console.log("DEFAULT SHIFT CONFIG:", defaultShiftConfig);
+
     const project = await Project.create({
       name: name || `${templateKey} project`,
       template: template._id,
       engineType,
       shiftModel: template.defaultShiftModel,
       shiftPerWeek: template.defaultShiftPerWeek,
-      shiftConfig: template.shiftConfigs.find(c => c.shiftModel === template.defaultShiftModel) || {},
+      timeSlots: defaultShiftConfig.timeSlots,
       demandSlots: [],
     });
 

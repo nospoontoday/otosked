@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import { timeSlotSchema } from './Template.js';
+
 
 const demandSlotSchema = new mongoose.Schema({
   slot_id: { type: String, required: true },
@@ -17,7 +19,7 @@ const projectSchema = new mongoose.Schema({
   engineType: { type: String, enum: ['task', 'demandSlot'], default: 'task' },
   shiftModel: { type: String, required: true},
   shiftPerWeek: { type: Number, required: true },
-  shiftConfig: { type: Object, default: {} },
+  timeSlots: [timeSlotSchema],
   demandSlots: [demandSlotSchema],
 }, { timestamps: true });
 

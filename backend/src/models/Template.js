@@ -15,7 +15,7 @@ const timeConfigSchema = new mongoose.Schema({
     days: { type: [String], default: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'] },
 }, { _id: false });
 
-const timeSlotSchema = new mongoose.Schema({
+export const timeSlotSchema = new mongoose.Schema({
     id: { type: String, required: true },
     label: { type: String, required: true },
     duration: { type: Number, default: 1 },
