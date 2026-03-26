@@ -122,29 +122,36 @@ const shiftPerWeekOptionSchema = new mongoose.Schema({
     },
 }, { _id: false });
 
+export const restPatternSchema = {
+    type: String,
+    enum: ['spread', 'consecutive'],
+    default: 'consecutive',
+}
+
 const templateSchema = new mongoose.Schema({
     key: { type: String, required: true, unique: true},
     name: { type: String, required: true },
     description: { type: String },
     timeConfig: { type: timeConfigSchema, default: () => ({}) },
     resourceTypes: [resourceTypeSchema],
+    restPattern: restPatternSchema,
     shiftConfigs: {
         type: [shiftConfigSchema],
         default: [
             {
-            shiftModel: '12h',
-            timeSlots: [
-                { id: 'day', label: 'Day Shift', duration: 12, start: 7, end: 19 },
-                { id: 'night', label: 'Night Shift', duration: 12, start: 19, end: 7 },
-            ],
+                shiftModel: '12h',
+                timeSlots: [
+                    { id: 'day', label: 'Day Shift', duration: 12, start: 7, end: 19 },
+                    { id: 'night', label: 'Night Shift', duration: 12, start: 19, end: 7 },
+                ],
             },
             {
-            shiftModel: '8h',
-            timeSlots: [
-                { id: 'morning', label: 'Morning Shift', duration: 8, start: 7, end: 15 },
-                { id: 'evening', label: 'Evening Shift', duration: 8, start: 15, end: 23 },
-                { id: 'night', label: 'Night Shift', duration: 8, start: 23, end: 7 },
-            ],
+                shiftModel: '8h',
+                timeSlots: [
+                    { id: 'morning', label: 'Morning Shift', duration: 8, start: 7, end: 15 },
+                    { id: 'evening', label: 'Evening Shift', duration: 8, start: 15, end: 23 },
+                    { id: 'night', label: 'Night Shift', duration: 8, start: 23, end: 7 },
+                ],
             },
         ],
     },

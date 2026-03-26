@@ -26,7 +26,9 @@ const store = async (req, res) => {
       c => c.shiftModel === template.defaultShiftModel
     );
 
-    console.log("DEFAULT SHIFT CONFIG:", defaultShiftConfig);
+    // calculate rest days based on template's default shift per week and shift model
+    // For example, if using 12h shifts with 3 shifts per week, that's 36 hours/week, so 4 rest days.
+    const restDays = Project.calculateDefaultRestDays(template.defaultShiftModel, template.defaultShiftPerWeek);
 
     const project = await Project.create({
       name: name || `${templateKey} project`,
@@ -34,8 +36,10 @@ const store = async (req, res) => {
       engineType,
       shiftModel: template.defaultShiftModel,
       shiftPerWeek: template.defaultShiftPerWeek,
+      restPattern: template.restPattern,
       timeSlots: defaultShiftConfig.timeSlots,
       demandSlots: [],
+      restDays,
     });
 
     return res.status(201).json(project);

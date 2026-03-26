@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { timeSlotSchema } from './Template.js';
+import { restPatternSchema, timeSlotSchema } from './Template.js';
 
 
 const demandSlotSchema = new mongoose.Schema({
@@ -22,6 +22,17 @@ const projectSchema = new mongoose.Schema({
   restDays: { type: Number, required: true, default: 0 },
   timeSlots: [timeSlotSchema],
   demandSlots: [demandSlotSchema],
+  restPattern: restPatternSchema,
 }, { timestamps: true });
+
+// Static method to calculate default rest days
+projectSchema.statics.calculateDefaultRestDays = function(shiftModel, shiftPerWeek) {
+  if (shiftModel === '12h') {
+    return 7 - shiftPerWeek;
+  } else if (shiftModel === '8h') {
+    return 2;
+  }
+  return 0; // fallback
+};
 
 export default mongoose.model('Project', projectSchema);
