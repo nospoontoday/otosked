@@ -1,6 +1,11 @@
 import { Moon } from "lucide-react"
-
+import { useHospitalConfigStore } from "../../stores/useHospitalConfigStore";
 const RestDefinitions = ({ restDaysPerNurse }) => {
+    const {
+        selectedRestPattern,
+        selectRestPattern,
+    } = useHospitalConfigStore();
+
 
     let withRest = restDaysPerNurse > 0;
 
@@ -36,6 +41,18 @@ const RestDefinitions = ({ restDaysPerNurse }) => {
                         {restDaysPerNurse}
                     </span>
                     <span className="text-[11px] text-slate-400">days/week</span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <label className="text-[11px] font-medium text-slate-500 w-28">Rest pattern</label>
+                    <select
+                        value={selectedRestPattern}
+                        onChange={e => selectRestPattern(e.target.value)}
+                        className="flex-1 bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs focus:ring-1 focus:ring-indigo-300 focus:outline-none"
+                    >
+                    <option value="scattered">Scattered (spread out)</option>
+                    <option value="fixed">Fixed Together (consecutive)</option>
+                    </select>
                 </div>
             </div>
           )}

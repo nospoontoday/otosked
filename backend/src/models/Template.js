@@ -122,11 +122,17 @@ const shiftPerWeekOptionSchema = new mongoose.Schema({
     },
 }, { _id: false });
 
-export const restPatternSchema = {
-    type: String,
-    enum: ['spread', 'consecutive'],
-    default: 'consecutive',
-}
+const restPatternSchema = new mongoose.Schema({
+  value: { 
+    type: String, 
+    enum: ['spread', 'consecutive'], 
+    required: true 
+  },
+  label: { 
+    type: String, 
+    required: true 
+  },
+}, { _id: false });
 
 const templateSchema = new mongoose.Schema({
     key: { type: String, required: true, unique: true},
@@ -134,7 +140,13 @@ const templateSchema = new mongoose.Schema({
     description: { type: String },
     timeConfig: { type: timeConfigSchema, default: () => ({}) },
     resourceTypes: [resourceTypeSchema],
-    restPattern: restPatternSchema,
+    restPatterns: {
+        type: [restPatternSchema],
+        default: [
+            { value: 'spread', label: 'Scattered (spread out)' },
+            { value: 'consecutive', label: 'Fixed Together (consecutive)' },
+        ],
+    },
     shiftConfigs: {
         type: [shiftConfigSchema],
         default: [

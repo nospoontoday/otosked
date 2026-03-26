@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { restPatternSchema, timeSlotSchema } from './Template.js';
+import { timeSlotSchema } from './Template.js';
 
 
 const demandSlotSchema = new mongoose.Schema({
@@ -22,7 +22,11 @@ const projectSchema = new mongoose.Schema({
   restDays: { type: Number, required: true, default: 0 },
   timeSlots: [timeSlotSchema],
   demandSlots: [demandSlotSchema],
-  restPattern: restPatternSchema,
+  restPattern: {
+    type: String, 
+    enum: ['spread', 'consecutive'], 
+    default: 'consecutive'
+  }
 }, { timestamps: true });
 
 // Static method to calculate default rest days

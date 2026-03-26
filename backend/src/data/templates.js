@@ -18,6 +18,10 @@ const templates = {
       { id: 'rt_nur', name: 'Nurses', isExclusive: true, needsRouting: false, role: '' },
       { id: 'rt_dept', name: 'Departments', isExclusive: false, needsRouting: false, role: '' },
     ],
+    restPattern: [
+      { value: 'spread', label: 'Scattered (spread out)' },
+      { value: 'consecutive', label: 'Fixed Together (consecutive)' },
+    ],
     timeSlots: [
       { id: 'ts_mon_day', label: 'Mon 7:00 AM - 7:00 PM', duration: 12 },
       { id: 'ts_mon_night', label: 'Mon 7:00 PM - 7:00 AM', duration: 12 },
