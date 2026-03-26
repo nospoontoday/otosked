@@ -1,32 +1,36 @@
 
 import { formatHour, getAutoEnd, generateHours, buildShiftSequence } from "../../utils/time";
+import { useHospitalConfigStore } from "../../stores/useHospitalConfigStore";
 
 const ShiftDefinitions = ({
-  timeSlots = [],
   modelDuration,
-  onTimeSlotsChange,
 }) => {
   const hours = generateHours();
 
+  const {
+    dailyShiftSlots,
+    setDailyShiftSlots
+  } = useHospitalConfigStore();
+
   const handleStartChange = (newStart) => {
-    const newSequence = buildShiftSequence(newStart, modelDuration, timeSlots.length);
-    const updatedSlots = timeSlots.map((slot, idx) => ({
+    const newSequence = buildShiftSequence(newStart, modelDuration, dailyShiftSlots.length);
+    const updatedSlots = dailyShiftSlots.map((slot, idx) => ({
       ...slot,
       start: newSequence[idx].start,
     }));
-    onTimeSlotsChange(updatedSlots);
+    setDailyShiftSlots(updatedSlots);
   };
 
   const handleLabelChange = (idx, newLabel) => {
-    const updatedSlots = timeSlots.map((slot, i) =>
+    const updatedSlots = dailyShiftSlots.map((slot, i) =>
       i === idx ? { ...slot, label: newLabel } : slot
     );
-    onTimeSlotsChange(updatedSlots);
+    setDailyShiftSlots(updatedSlots);
   };
 
   return (
     <div className="mt-3 space-y-2">
-      {timeSlots.map((slot, idx) => {
+      {dailyShiftSlots.map((slot, idx) => {
         const autoEnd = getAutoEnd(slot.start, modelDuration);
 
         return (

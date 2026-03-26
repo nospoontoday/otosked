@@ -1,6 +1,12 @@
 import { Calendar } from "lucide-react"
+import { useHospitalConfigStore } from "../../stores/useHospitalConfigStore";
 
-const SkedDuration = ({duration, onDurationChange}) => {
+const SkedDuration = () => {
+    const {
+        scheduleLengthWeeks,
+        setScheduleLengthWeeks
+    } = useHospitalConfigStore();
+
     return (
         <div>
             <h3 className="font-semibold text-slate-800 mb-1 flex items-center gap-2">
@@ -10,8 +16,8 @@ const SkedDuration = ({duration, onDurationChange}) => {
             <div className="flex items-center gap-2">
                 <input
                     type="number" min="1" max="12"
-                    value={duration}
-                    onChange={e => onDurationChange(parseInt(e.target.value) || 1)}
+                    value={scheduleLengthWeeks}
+                    onChange={e => setScheduleLengthWeeks(parseInt(e.target.value) || 1)}
                     className="w-20 px-3 py-2 border border-slate-200 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-indigo-300"
                 />
                 <span className="text-sm text-slate-500">weeks</span>
