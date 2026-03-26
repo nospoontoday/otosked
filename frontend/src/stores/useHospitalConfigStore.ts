@@ -61,10 +61,14 @@ export const useHospitalConfigStore = create<HospitalConfigStore>((set, get) => 
     const { availableShiftModels } = get();
 
     const config = availableShiftModels.find(c => c.shiftModel === shiftModel);
+    // Shifts per nurse per week is based on whether it's a 12h or 8h shift model.
+    // the 12h model has 2 types of shifts: 3 shifts per week (36 hours) or 4 shifts per week (48 hours). The 8h model has 5 shifts per week (40 hours).
+    const shiftsPerNursePerWeek = shiftModel === '8h' ? 5 : 3;
 
     set({
       selectedShiftModel: shiftModel,
-      dailyShiftSlots: config?.timeSlots || []
+      dailyShiftSlots: config?.timeSlots || [],
+      shiftsPerNursePerWeek: shiftsPerNursePerWeek,
     });
   },
 
@@ -77,10 +81,13 @@ export const useHospitalConfigStore = create<HospitalConfigStore>((set, get) => 
   getStaffingMetrics: () => {
     const { selectedShiftModel, shiftsPerNursePerWeek, scheduleLengthWeeks, dailyShiftSlots } = get();
 
-    const shiftModels = get().availableShiftModels.find(c => c.shiftModel === selectedShiftModel);
+    // calculate nurses needed based on shifts per week and shift model
+    let nursesNeeded = 0;
+    let restDaysPerNurse = 0;
 
-    const nursesNeeded = shiftModels ? shiftModels.nursesNeeded : 0;
-    const restDaysPerNurse = Math.max(0, 7 - shiftsPerNursePerWeek);
+    const totalShiftsPerWeek = dailyShiftSlots.length * 7;
+    nursesNeeded = Math.ceil(totalShiftsPerWeek / shiftsPerNursePerWeek);
+    restDaysPerNurse = Math.max(0, 7 - shiftsPerNursePerWeek);
 
     return {
       nursesNeeded,
