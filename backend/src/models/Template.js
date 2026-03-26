@@ -41,6 +41,12 @@ const shiftConfigSchema = new mongoose.Schema({
     min: 1,
   },
 
+  minRestHours: {
+    type: Number,
+    default: 12,
+    min: 0,
+  },
+
 }, { _id: false });
 
 const availabilityRuleSchema = new mongoose.Schema({
@@ -163,6 +169,7 @@ const templateSchema = new mongoose.Schema({
                     { id: 'night', label: 'Night Shift', duration: 12, start: 19, end: 7 },
                 ],
                 maxConsecutiveShifts: 3,
+                minRestHours: 12,
             },
             {
                 shiftModel: '8h',
@@ -172,6 +179,7 @@ const templateSchema = new mongoose.Schema({
                     { id: 'night', label: 'Night Shift', duration: 8, start: 23, end: 7 },
                 ],
                 maxConsecutiveShifts: 5,
+                minRestHours: 10,
             },
         ],
     },

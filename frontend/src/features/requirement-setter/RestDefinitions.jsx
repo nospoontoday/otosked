@@ -7,6 +7,9 @@ const RestDefinitions = ({ restDaysPerNurse }) => {
         selectedShiftModel,
         maxConsecutiveShifts,
         setMaxConsecutiveShifts,
+        minRestHours,
+        setMinRestHours,
+        toggleRestDaysPerNurse,
     } = useHospitalConfigStore();
 
 
@@ -19,7 +22,7 @@ const RestDefinitions = ({ restDaysPerNurse }) => {
           </label>
           <div className="flex items-center gap-3 mt-2 mb-3">
             <button
-            //   onClick={() => handleToggleRest(false)}
+              onClick={() => toggleRestDaysPerNurse(false)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition ${
                 !withRest ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
               }`}
@@ -27,7 +30,7 @@ const RestDefinitions = ({ restDaysPerNurse }) => {
               No Rest
             </button>
             <button
-            //   onClick={() => handleToggleRest(true)}
+              onClick={() => toggleRestDaysPerNurse(true)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition ${
                 withRest ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
               }`}
@@ -67,6 +70,17 @@ const RestDefinitions = ({ restDaysPerNurse }) => {
                     className="w-16 px-2 py-1.5 border border-slate-200 rounded-lg text-xs text-center focus:outline-none focus:ring-1 focus:ring-indigo-300"
                   />
                   <span className="text-[11px] text-slate-400">shifts</span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <label className="text-[11px] font-medium text-slate-500 w-28">Min rest between</label>
+                  <input
+                    type="number" min="4" max="24"
+                    value={minRestHours}
+                    onChange={e => setMinRestHours(parseInt(e.target.value) || 8)}
+                    className="w-16 px-2 py-1.5 border border-slate-200 rounded-lg text-xs text-center focus:outline-none focus:ring-1 focus:ring-indigo-300"
+                  />
+                  <span className="text-[11px] text-slate-400">hours</span>
                 </div>
             </div>
           )}

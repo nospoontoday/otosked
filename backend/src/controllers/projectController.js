@@ -43,6 +43,7 @@ const store = async (req, res) => {
       restPattern: defaultRestPattern ? defaultRestPattern.value : 'spread',
       timeSlots: defaultShiftConfig.timeSlots,
       maxConsecutiveShifts: defaultShiftConfig.maxConsecutiveShifts,
+      minRestHours: defaultShiftConfig.minRestHours,
       demandSlots: [],
       restDays,
     });
