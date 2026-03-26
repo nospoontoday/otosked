@@ -22,6 +22,7 @@ const projectSchema = new mongoose.Schema({
   restDays: { type: Number, required: true, default: 0 },
   timeSlots: [timeSlotSchema],
   demandSlots: [demandSlotSchema],
+  maxConsecutiveShifts: { type: Number, default: 0 },
   restPattern: {
     type: String, 
     enum: ['spread', 'consecutive'], 

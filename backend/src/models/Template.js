@@ -33,7 +33,13 @@ const shiftConfigSchema = new mongoose.Schema({
   timeSlots: {
     type: [timeSlotSchema],
     default: [],
-  }
+  },
+
+  maxConsecutiveShifts: {
+    type: Number,
+    default: 3,
+    min: 1,
+  },
 
 }, { _id: false });
 
@@ -156,6 +162,7 @@ const templateSchema = new mongoose.Schema({
                     { id: 'day', label: 'Day Shift', duration: 12, start: 7, end: 19 },
                     { id: 'night', label: 'Night Shift', duration: 12, start: 19, end: 7 },
                 ],
+                maxConsecutiveShifts: 3,
             },
             {
                 shiftModel: '8h',
@@ -164,6 +171,7 @@ const templateSchema = new mongoose.Schema({
                     { id: 'evening', label: 'Evening Shift', duration: 8, start: 15, end: 23 },
                     { id: 'night', label: 'Night Shift', duration: 8, start: 23, end: 7 },
                 ],
+                maxConsecutiveShifts: 5,
             },
         ],
     },
@@ -195,6 +203,12 @@ const templateSchema = new mongoose.Schema({
         type: Number,
         enum: [3, 4],
         default: 3,
+    },
+
+    defaultRestPattern: {
+        type: String,
+        enum: ['spread', 'consecutive'],
+        default: 'spread',
     },
 
     duration: { type: Number, default: 1 },
