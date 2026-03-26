@@ -10,6 +10,7 @@ type HospitalConfigStore = {
 
   // selection (what user chooses)
   selectedShiftModel: string | null;
+  selectedRestPattern: string | null;
   shiftsPerNursePerWeek: number;
   scheduleLengthWeeks: number;
 
@@ -20,6 +21,7 @@ type HospitalConfigStore = {
   //actions
   initializeFromProject: (project: any) => void;
   selectShiftModel: (shiftModel: string) => void;
+  selectRestPattern: (restPattern: string) => void;
   setShiftsPerNursePerWeek: (shiftPerWeek: number) => void;
   setScheduleLengthWeeks: (duration: number) => void;
   setDailyShiftSlots: (timeSlots: string[]) => void;
@@ -34,6 +36,7 @@ type HospitalConfigStore = {
 export const useHospitalConfigStore = create<HospitalConfigStore>((set, get) => ({
   // state
   selectedShiftModel: null,
+  selectedRestPattern: null,
   shiftsPerNursePerWeek: 3,
   scheduleLengthWeeks: 1,
   dailyShiftSlots: [],
@@ -44,12 +47,15 @@ export const useHospitalConfigStore = create<HospitalConfigStore>((set, get) => 
     const initialShiftModel =
       project.shiftModel || project.template.defaultShiftModel;
 
+    const initialRestPattern = project.restPattern || project.template.restPattern;
+
     const config = project.template.shiftConfigs.find(
       c => c.shiftModel === initialShiftModel
     );
 
     set({
       selectedShiftModel: initialShiftModel,
+      selectedRestPattern: initialRestPattern,
       shiftsPerNursePerWeek: project.shiftPerWeek || 3,
       scheduleLengthWeeks: project.template.duration || 1,
       dailyShiftSlots: config?.timeSlots || [],
@@ -71,6 +77,8 @@ export const useHospitalConfigStore = create<HospitalConfigStore>((set, get) => 
       shiftsPerNursePerWeek: shiftsPerNursePerWeek,
     });
   },
+
+  selectRestPattern: (restPattern) => set({ selectedRestPattern: restPattern }),
 
   setShiftsPerNursePerWeek: (shiftPerWeek) => set({ shiftsPerNursePerWeek: shiftPerWeek }),
 
