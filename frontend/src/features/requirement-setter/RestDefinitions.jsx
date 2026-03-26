@@ -4,6 +4,9 @@ const RestDefinitions = ({ restDaysPerNurse }) => {
     const {
         selectedRestPattern,
         selectRestPattern,
+        selectedShiftModel,
+        maxConsecutiveShifts,
+        setMaxConsecutiveShifts,
     } = useHospitalConfigStore();
 
 
@@ -53,6 +56,17 @@ const RestDefinitions = ({ restDaysPerNurse }) => {
                     <option value="scattered">Scattered (spread out)</option>
                     <option value="fixed">Fixed Together (consecutive)</option>
                     </select>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <label className="text-[11px] font-medium text-slate-500 w-28">Max consec. {selectedShiftModel}</label>
+                  <input
+                    type="number" min="1" max="7"
+                    value={maxConsecutiveShifts}
+                    onChange={e => setMaxConsecutiveShifts(parseInt(e.target.value) || 1)}
+                    className="w-16 px-2 py-1.5 border border-slate-200 rounded-lg text-xs text-center focus:outline-none focus:ring-1 focus:ring-indigo-300"
+                  />
+                  <span className="text-[11px] text-slate-400">shifts</span>
                 </div>
             </div>
           )}
