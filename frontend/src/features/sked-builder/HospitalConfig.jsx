@@ -22,7 +22,7 @@ const HospitalConfig = ({ project }) => {
             <NurseShiftModel
                 shiftModels={project.template.shiftModels}
                 shiftPerWeekOptions={project.template.shiftPerWeekOptions}
-                withRest={restDaysPerNurse > 0}
+                restDaysPerNurse={restDaysPerNurse}
             />
         </div>
     )

@@ -6,7 +6,7 @@ import { useHospitalConfigStore } from "../../stores/useHospitalConfigStore";
 const NurseShiftModel = ({
     shiftModels = [],
     shiftPerWeekOptions = [],
-    withRest = false,
+    restDaysPerNurse = 0,
 }) => {
     const {
         selectedShiftModel,
@@ -73,7 +73,7 @@ const NurseShiftModel = ({
             <ShiftDefinitions modelDuration={modelDuration} />
 
             {/* Rest Configuration */}
-            <RestDefinitions withRest={withRest} />
+            <RestDefinitions restDaysPerNurse={restDaysPerNurse} />
         </div>
     )
 }
