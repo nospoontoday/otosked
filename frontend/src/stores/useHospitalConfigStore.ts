@@ -4,6 +4,8 @@ type ShiftConfig = {
   shiftModel: string;
   timeSlots: string[];
   nursesNeeded: number;
+  maxConsecutiveShifts: number;
+  minRestHours: number;
 };
 
 type HospitalConfigStore = {
@@ -13,11 +15,13 @@ type HospitalConfigStore = {
   selectedRestPattern: string | null;
   shiftsPerNursePerWeek: number;
   scheduleLengthWeeks: number;
+  restDaysPerNurse: number;
 
   // structure (what defines a shift system)
   dailyShiftSlots: string[];
   availableShiftModels: ShiftConfig[];
   maxConsecutiveShifts: number;
+  minRestHours: number;
 
   //actions
   initializeFromProject: (project: any) => void;
@@ -27,6 +31,8 @@ type HospitalConfigStore = {
   setScheduleLengthWeeks: (duration: number) => void;
   setDailyShiftSlots: (timeSlots: string[]) => void;
   setMaxConsecutiveShifts: (maxConsecutiveShifts: number) => void;
+  setMinRestHours: (minRestHours: number) => void;
+  toggleRestDaysPerNurse: (withRest: boolean) => void;
 
   // derived
   getStaffingMetrics: () => {
@@ -44,6 +50,7 @@ export const useHospitalConfigStore = create<HospitalConfigStore>((set, get) => 
     }),
 
     setMaxConsecutiveShifts: (maxConsecutiveShifts: number) => set({ maxConsecutiveShifts }),
+    setMinRestHours: (minRestHours: number) => set({ minRestHours }),
 
     selectShiftModel: (shiftModel: string) => {
       const { availableShiftModels } = get();
@@ -52,12 +59,23 @@ export const useHospitalConfigStore = create<HospitalConfigStore>((set, get) => 
 
       // Use the setter to update both shiftsPerNursePerWeek and maxConsecutiveShifts
       actions.setShiftsPerNursePerWeek(shiftsPerNursePerWeek);
+      actions.setRestDaysPerNurse(7 - shiftsPerNursePerWeek);
+
+
+      // set min rest hours
+      if (config?.minRestHours !== undefined) {
+        actions.setMinRestHours(config.minRestHours);
+      }
 
       // Update other properties directly
       set({
         selectedShiftModel: shiftModel,
         dailyShiftSlots: config?.timeSlots || [],
       });
+    },
+
+    setRestDaysPerNurse: (restDays: number) => {
+      set({ restDaysPerNurse: restDays });
     },
   };
 
@@ -70,6 +88,8 @@ export const useHospitalConfigStore = create<HospitalConfigStore>((set, get) => 
     dailyShiftSlots: [],
     availableShiftModels: [],
     maxConsecutiveShifts: 3,
+    minRestHours: 12,
+    restDaysPerNurse: 4,
 
     // actions
     ...actions,
@@ -99,16 +119,50 @@ export const useHospitalConfigStore = create<HospitalConfigStore>((set, get) => 
 
     setDailyShiftSlots: (timeSlots) => set({ dailyShiftSlots: timeSlots }),
 
+    toggleRestDaysPerNurse: (withRest) => {
+      if (!withRest) {
+        // Batch all "no rest" resets into one set() call
+        set({
+          restDaysPerNurse: 0,
+          selectedRestPattern: null,
+          maxConsecutiveShifts: 0,
+          minRestHours: 0,
+        });
+        return;
+      }
+
+      // With rest: detect current config and set smart defaults
+      const { shiftsPerNursePerWeek, selectedShiftModel, availableShiftModels } = get();
+      
+      // Find the shift config for the currently selected shift model
+      const currentShiftConfig = availableShiftModels.find(
+        c => c.shiftModel === selectedShiftModel
+      );
+
+      // Calculate rest days based on current shifts per week
+      const restDays = 7 - shiftsPerNursePerWeek;
+
+      // Use shift config defaults or fallback to calculated values
+      const maxConsecutiveShifts = currentShiftConfig?.maxConsecutiveShifts || shiftsPerNursePerWeek;
+      const minRestHours = currentShiftConfig?.minRestHours || (shiftsPerNursePerWeek === 5 ? 12 : 24);
+
+      // Batch all updates into one set() call
+      set({
+        restDaysPerNurse: restDays,
+        maxConsecutiveShifts,
+        minRestHours,
+        selectedRestPattern: 'spread', // Set sensible default pattern when enabling rest
+      });
+    },
+
     getStaffingMetrics: () => {
-      const { shiftsPerNursePerWeek, dailyShiftSlots } = get();
+      const { shiftsPerNursePerWeek, dailyShiftSlots, restDaysPerNurse } = get();
 
       // calculate nurses needed based on shifts per week and shift model
       let nursesNeeded = 0;
-      let restDaysPerNurse = 0;
 
       const totalShiftsPerWeek = dailyShiftSlots.length * 7;
       nursesNeeded = Math.ceil(totalShiftsPerWeek / shiftsPerNursePerWeek);
-      restDaysPerNurse = Math.max(0, 7 - shiftsPerNursePerWeek);
 
       return {
         nursesNeeded,
