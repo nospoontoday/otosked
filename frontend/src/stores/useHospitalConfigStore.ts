@@ -6,6 +6,7 @@ type ShiftConfig = {
   nursesNeeded: number;
   maxConsecutiveShifts: number;
   minRestHours: number;
+  maxNightShiftsPerPeriod: number;
 };
 
 type HospitalConfigStore = {
@@ -22,6 +23,7 @@ type HospitalConfigStore = {
   availableShiftModels: ShiftConfig[];
   maxConsecutiveShifts: number;
   minRestHours: number;
+  maxNightShiftsPerPeriod: number;
 
   //actions
   initializeFromProject: (project: any) => void;
@@ -33,6 +35,7 @@ type HospitalConfigStore = {
   setMaxConsecutiveShifts: (maxConsecutiveShifts: number) => void;
   setMinRestHours: (minRestHours: number) => void;
   toggleRestDaysPerNurse: (withRest: boolean) => void;
+  setMaxNightShiftsPerPeriod: (maxNightShifts: number) => void;
 
   // derived
   getStaffingMetrics: () => {
@@ -51,6 +54,7 @@ export const useHospitalConfigStore = create<HospitalConfigStore>((set, get) => 
 
     setMaxConsecutiveShifts: (maxConsecutiveShifts: number) => set({ maxConsecutiveShifts }),
     setMinRestHours: (minRestHours: number) => set({ minRestHours }),
+    setMaxNightShiftsPerPeriod: (maxNightShiftsPerPeriod: number) => set({ maxNightShiftsPerPeriod }),
 
     selectShiftModel: (shiftModel: string) => {
       const { availableShiftModels } = get();
@@ -71,6 +75,7 @@ export const useHospitalConfigStore = create<HospitalConfigStore>((set, get) => 
       set({
         selectedShiftModel: shiftModel,
         dailyShiftSlots: config?.timeSlots || [],
+        maxNightShiftsPerPeriod: config?.maxNightShiftsPerPeriod || 4,
       });
     },
 
@@ -90,6 +95,7 @@ export const useHospitalConfigStore = create<HospitalConfigStore>((set, get) => 
     maxConsecutiveShifts: 3,
     minRestHours: 12,
     restDaysPerNurse: 4,
+    maxNightShiftsPerPeriod: 4,
 
     // actions
     ...actions,
@@ -145,13 +151,15 @@ export const useHospitalConfigStore = create<HospitalConfigStore>((set, get) => 
       // Use shift config defaults or fallback to calculated values
       const maxConsecutiveShifts = currentShiftConfig?.maxConsecutiveShifts || shiftsPerNursePerWeek;
       const minRestHours = currentShiftConfig?.minRestHours || (shiftsPerNursePerWeek === 5 ? 12 : 24);
+      const maxNightShiftsPerPeriod = currentShiftConfig?.maxNightShiftsPerPeriod || 4;
 
       // Batch all updates into one set() call
       set({
         restDaysPerNurse: restDays,
         maxConsecutiveShifts,
         minRestHours,
-        selectedRestPattern: 'spread', // Set sensible default pattern when enabling rest
+        selectedRestPattern: 'spread',
+        maxNightShiftsPerPeriod,
       });
     },
 

@@ -24,11 +24,13 @@ const projectSchema = new mongoose.Schema({
   demandSlots: [demandSlotSchema],
   maxConsecutiveShifts: { type: Number, default: 0 },
   minRestHours: { type: Number, default: 0 },
+  maxNightShiftsPerPeriod: { type: Number, default: 0 },
   restPattern: {
     type: String, 
     enum: ['spread', 'consecutive'], 
     default: 'consecutive'
-  }
+  },
+  duration: { type: Number, default: 1 },
 }, { timestamps: true });
 
 // Static method to calculate default rest days
