@@ -75,4 +75,44 @@ const show = async (req, res) => {
   }
 };
 
-export { index, store, show };
+const update = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      shiftModel,
+      shiftPerWeek,
+      restPattern,
+      restDays,
+      maxConsecutiveShifts,
+      minRestHours,
+      maxNightShiftsPerPeriod,
+      scheduleLengthWeeks,
+    } = req.body;
+
+    const project = await Project.findByIdAndUpdate(
+      id,
+      {
+        shiftModel,
+        shiftPerWeek,
+        restPattern,
+        restDays,
+        maxConsecutiveShifts,
+        minRestHours,
+        maxNightShiftsPerPeriod,
+        duration: scheduleLengthWeeks,
+      },
+      { new: true, runValidators: true }
+    ).populate('template');
+
+    if (!project) {
+      return res.status(404).json({ message: 'Project not found' });
+    }
+
+    return res.status(200).json(project);
+  } catch (err) {
+    console.error('Error updating project:', err);
+    return res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+export { index, store, show, update };

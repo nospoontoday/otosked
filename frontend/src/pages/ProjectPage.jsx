@@ -4,10 +4,17 @@ import { ArrowLeft } from 'lucide-react';
 import { useProject } from '../hooks/useProjects';
 import Header from '../components/Header';
 import SchemaBuilder from '../features/sked-builder/SchemaBuilder';
+import { useEffect } from 'react';
+import { setupHospitalConfigAutoSave } from '../stores/useHospitalConfigAutoSave';
 
 const ProjectPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const unsubscribe = setupHospitalConfigAutoSave();
+    return unsubscribe;
+  }, []);
 
   const {
     data: project,
