@@ -14,3 +14,8 @@ export const getProject = async (id) => {
   const res = await api.get(`/projects/${id}`);
   return res.data;
 };
+
+export const updateProject = async (id, config) => {
+  const res = await api.put(`/projects/${id}`, config);
+  return res.data;
+};
