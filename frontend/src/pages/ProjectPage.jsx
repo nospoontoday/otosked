@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
 import { useProject } from '../hooks/useProjects';
+import { useFeasibilityCheck } from '../hooks/useFeasibilityCheck';
 import Header from '../components/Header';
 import SchemaBuilder from '../features/sked-builder/SchemaBuilder';
 import { useEffect } from 'react';
@@ -22,6 +23,8 @@ const ProjectPage = () => {
     isError,
     error,
   } = useProject(id);
+
+  const { feasibility, isLoading: feasibilityLoading, refetch } = useFeasibilityCheck(id);
 
   if (isLoading) {
     return (
@@ -90,6 +93,9 @@ const ProjectPage = () => {
           <SchemaBuilder
             templateKey={project.template.key}
             project={project}
+            feasibility={feasibility}
+            isFeasibilityLoading={feasibilityLoading}
+            onFeasibilityRefresh={refetch}
           />
         </div>
       </div>

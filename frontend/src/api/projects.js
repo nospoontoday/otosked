@@ -19,3 +19,13 @@ export const updateProject = async (id, config) => {
   const res = await api.put(`/projects/${id}`, config);
   return res.data;
 };
+
+export const checkProjectFeasibility = async (id) => {
+  const res = await api.get(`/projects/${id}/check-feasibility`);
+  return res.data;
+};
+
+export const checkFeasibility = async (projectData) => {
+  const res = await api.post('/projects/check-feasibility', projectData);
+  return res.data;
+};

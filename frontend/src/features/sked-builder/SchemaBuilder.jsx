@@ -1,8 +1,9 @@
 import { ChevronRight } from "lucide-react";
 import HospitalConfig from "./HospitalConfig";
 import SchoolConfig from "./SchoolConfig";
+import FeasibilityReport from "../../components/FeasibilityReport";
 
-const SchemaBuilder = ({templateKey, project}) => {
+const SchemaBuilder = ({templateKey, project, feasibility, isFeasibilityLoading, onFeasibilityRefresh}) => {
     const isUniversity = templateKey === 'university';
     const isHospital = templateKey === 'hospital';
 
@@ -42,6 +43,13 @@ const SchemaBuilder = ({templateKey, project}) => {
                     ) : (
                         <SchoolConfig />
                     )}
+                </div>
+                <div className="w-full md:w-2/3 p-6 max-h-[80vh] overflow-y-auto">
+                    <FeasibilityReport 
+                        feasibility={feasibility} 
+                        isLoading={isFeasibilityLoading}
+                        onRefresh={onFeasibilityRefresh}
+                    />
                 </div>
             </div>
         </div>

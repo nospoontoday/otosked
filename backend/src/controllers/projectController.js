@@ -1,11 +1,33 @@
 
 import Project from '../models/Project.js';
 import Template from '../models/Template.js';
+import { checkFeasibility } from '../services/feasibilityService.js';
 
 const index = async (_req, res) => {
   try {
     const projects = await Project.find().populate('template');
     return res.status(200).json(projects);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+};
+
+const checkFeasibilityHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    let project;
+    if (id) {
+      project = await Project.findById(id).populate('template');
+      if (!project) {
+        return res.status(404).json({ message: 'Project not found' });
+      }
+    } else {
+      project = req.body;
+    }
+
+    const result = checkFeasibility(project);
+    return res.status(200).json(result);
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
@@ -89,6 +111,7 @@ const update = async (req, res) => {
       maxNightShiftsPerPeriod,
       scheduleLengthWeeks: duration,
       dailyShiftSlots: timeSlots,
+      departments,
     } = req.body;
 
     const project = await Project.findByIdAndUpdate(
@@ -103,6 +126,7 @@ const update = async (req, res) => {
         maxNightShiftsPerPeriod,
         duration,
         timeSlots,
+        departments,
       },
       { new: true, runValidators: true }
     );
@@ -119,4 +143,4 @@ const update = async (req, res) => {
   }
 };
 
-export { index, store, show, update };
+export { index, store, show, update, checkFeasibilityHandler };
