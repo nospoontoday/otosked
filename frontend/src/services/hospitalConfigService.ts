@@ -73,6 +73,15 @@ export const hospitalConfigService = {
       scheduleLengthWeeks: project.duration || project.template.duration || 1,
       dailyShiftSlots: project.timeSlots || config?.timeSlots || [],
       availableShiftModels: project.template.shiftConfigs,
+      departments: project.departments || [
+        { name: "ICU", nursesPerShift: 1, doctorsPerShift: 1 },
+        { name: "ER", nursesPerShift: 2, doctorsPerShift: 1 },
+        { name: "General Ward", nursesPerShift: 3, doctorsPerShift: 1 },
+      ],
+      restDaysPerNurse: project.restDays ?? config?.restDays ?? (7 - (project.shiftPerWeek || 3)),
+      maxConsecutiveShifts: project.maxConsecutiveShifts ?? config?.maxConsecutiveShifts ?? (project.shiftPerWeek || 3),
+      minRestHours: project.minRestHours ?? config?.minRestHours ?? 12,
+      maxNightShiftsPerPeriod: project.maxNightShiftsPerPeriod ?? config?.maxNightShiftsPerPeriod ?? 4,
     };
   },
 };

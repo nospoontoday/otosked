@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import SkedDuration from "../requirement-setter/SkedDuration"
 import NurseShiftModel from "../requirement-setter/NurseShiftModel"
+import DepartmentConfig from "./DepartmentConfig"
 import { useHospitalConfigStore } from "../../stores/useHospitalConfigStore";
 
 const HospitalConfig = ({ project }) => {
@@ -24,6 +25,8 @@ const HospitalConfig = ({ project }) => {
                 shiftPerWeekOptions={project.template.shiftPerWeekOptions}
                 restDaysPerNurse={restDaysPerNurse}
             />
+
+            <DepartmentConfig />
         </div>
     )
 }

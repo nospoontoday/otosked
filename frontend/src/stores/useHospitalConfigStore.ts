@@ -19,6 +19,32 @@ export const useHospitalConfigStore = create((set, get) => ({
   minRestHours: 12,
   maxNightShiftsPerPeriod: 4,
 
+  departments: [
+    { name: "ICU", nursesPerShift: 1, doctorsPerShift: 1 },
+    { name: "ER", nursesPerShift: 2, doctorsPerShift: 1 },
+    { name: "General Ward", nursesPerShift: 3, doctorsPerShift: 1 },
+  ],
+
+  addDepartment: () =>
+    set((state) => ({
+      departments: [
+        ...state.departments,
+        { name: "", nursesPerShift: 1, doctorsPerShift: 1 },
+      ],
+    })),
+
+  removeDepartment: (index) =>
+    set((state) => ({
+      departments: state.departments.filter((_, i) => i !== index),
+    })),
+
+  updateDepartment: (index, field, value) =>
+    set((state) => ({
+      departments: state.departments.map((dept, i) =>
+        i === index ? { ...dept, [field]: value } : dept
+      ),
+    })),
+
   saveConfig: async () => {
     const state = get();
 
@@ -35,7 +61,14 @@ export const useHospitalConfigStore = create((set, get) => ({
     const mapped = hospitalConfigService.mapProjectToState(project);
     set({
       ...mapped,
-      projectId: project._id || project.id, // whichever field is used
+      projectId: project._id || project.id,
+      departments: project.departments && project.departments.length > 0
+        ? project.departments
+        : [
+            { name: "ICU", nursesPerShift: 1, doctorsPerShift: 1 },
+            { name: "ER", nursesPerShift: 2, doctorsPerShift: 1 },
+            { name: "General Ward", nursesPerShift: 3, doctorsPerShift: 1 },
+          ],
     });
   },
 

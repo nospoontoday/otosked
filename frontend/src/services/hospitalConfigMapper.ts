@@ -8,4 +8,5 @@ export const mapStateToPayload = (state: any) => ({
     selectedRestPattern: state.selectedRestPattern,
     scheduleLengthWeeks: state.scheduleLengthWeeks,
     dailyShiftSlots: state.dailyShiftSlots,
+    departments: state.departments,
 });

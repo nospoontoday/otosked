@@ -22,7 +22,7 @@ const checkFeasibilityLocally = (store) => {
   const duration = scheduleLengthWeeks || 1;
   const timeSlots = dailyShiftSlots || [];
 
-  const departments = [
+  const departments = store.departments || [
     { name: 'ICU', nursesPerShift: 1, doctorsPerShift: 1 },
     { name: 'ER', nursesPerShift: 2, doctorsPerShift: 1 },
     { name: 'General Ward', nursesPerShift: 3, doctorsPerShift: 1 },
@@ -235,6 +235,7 @@ export const useLocalFeasibilityCheck = () => {
   const maxConsecutiveShifts = useHospitalConfigStore((state) => state.maxConsecutiveShifts);
   const minRestHours = useHospitalConfigStore((state) => state.minRestHours);
   const selectedRestPattern = useHospitalConfigStore((state) => state.selectedRestPattern);
+  const departments = useHospitalConfigStore((state) => state.departments);
 
   console.log('useLocalFeasibilityCheck values:', {
     selectedShiftModel,
@@ -245,6 +246,7 @@ export const useLocalFeasibilityCheck = () => {
     maxConsecutiveShifts,
     minRestHours,
     selectedRestPattern,
+    departments,
   });
 
   const result = checkFeasibilityLocally({
@@ -256,6 +258,7 @@ export const useLocalFeasibilityCheck = () => {
     maxConsecutiveShifts,
     minRestHours,
     selectedRestPattern,
+    departments,
   });
 
   return result;
