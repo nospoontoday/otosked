@@ -9,4 +9,5 @@ export const mapStateToPayload = (state: any) => ({
     scheduleLengthWeeks: state.scheduleLengthWeeks,
     dailyShiftSlots: state.dailyShiftSlots,
     departments: state.departments,
+    nurses: state.nurses,
 });

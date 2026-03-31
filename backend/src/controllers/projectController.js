@@ -113,6 +113,7 @@ const update = async (req, res) => {
       scheduleLengthWeeks: duration,
       dailyShiftSlots: timeSlots,
       departments,
+      nurses,
     } = req.body;
 
     const project = await Project.findByIdAndUpdate(
@@ -128,6 +129,7 @@ const update = async (req, res) => {
         duration,
         timeSlots,
         departments,
+        nurses,
       },
       { new: true, runValidators: true }
     );

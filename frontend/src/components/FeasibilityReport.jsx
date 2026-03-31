@@ -38,10 +38,14 @@ const FeasibilityReport = ({ feasibility }) => {
           <Info className="w-4 h-4 text-indigo-500" />
           Weekly Staffing Summary
         </h4>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <div className="bg-slate-50 rounded-lg p-4">
             <p className="text-xs text-slate-500 uppercase tracking-wide">Departments</p>
             <p className="text-2xl font-bold text-slate-800">{summary?.totalDepartments || 0}</p>
+          </div>
+          <div className="bg-slate-50 rounded-lg p-4">
+            <p className="text-xs text-slate-500 uppercase tracking-wide">Nurses</p>
+            <p className="text-2xl font-bold text-slate-800">{summary?.totalNursesAvailable || 0}</p>
           </div>
           <div className="bg-slate-50 rounded-lg p-4">
             <p className="text-xs text-slate-500 uppercase tracking-wide">Nurses/Shift</p>

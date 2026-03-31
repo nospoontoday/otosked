@@ -25,6 +25,12 @@ export const useHospitalConfigStore = create((set, get) => ({
     { name: "General Ward", nursesPerShift: 3, doctorsPerShift: 1 },
   ],
 
+  nurses: [
+    { name: "Nurse 1", maxHoursPerWeek: 48, shiftPreference: "day" },
+    { name: "Nurse 2", maxHoursPerWeek: 48, shiftPreference: "day" },
+    { name: "Nurse 3", maxHoursPerWeek: 48, shiftPreference: "day" },
+  ],
+
   addDepartment: () =>
     set((state) => ({
       departments: [
@@ -42,6 +48,26 @@ export const useHospitalConfigStore = create((set, get) => ({
     set((state) => ({
       departments: state.departments.map((dept, i) =>
         i === index ? { ...dept, [field]: value } : dept
+      ),
+    })),
+
+  addNurse: () =>
+    set((state) => ({
+      nurses: [
+        ...state.nurses,
+        { name: "", maxHoursPerWeek: 48, shiftPreference: "day" },
+      ],
+    })),
+
+  removeNurse: (index) =>
+    set((state) => ({
+      nurses: state.nurses.filter((_, i) => i !== index),
+    })),
+
+  updateNurse: (index, field, value) =>
+    set((state) => ({
+      nurses: state.nurses.map((nurse, i) =>
+        i === index ? { ...nurse, [field]: value } : nurse
       ),
     })),
 
@@ -68,6 +94,13 @@ export const useHospitalConfigStore = create((set, get) => ({
             { name: "ICU", nursesPerShift: 1, doctorsPerShift: 1 },
             { name: "ER", nursesPerShift: 2, doctorsPerShift: 1 },
             { name: "General Ward", nursesPerShift: 3, doctorsPerShift: 1 },
+          ],
+      nurses: project.nurses && project.nurses.length > 0
+        ? project.nurses
+        : [
+            { name: "Nurse 1", maxHoursPerWeek: 48, shiftPreference: "day" },
+            { name: "Nurse 2", maxHoursPerWeek: 48, shiftPreference: "day" },
+            { name: "Nurse 3", maxHoursPerWeek: 48, shiftPreference: "day" },
           ],
     });
   },

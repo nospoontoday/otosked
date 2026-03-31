@@ -28,6 +28,8 @@ const checkFeasibilityLocally = (store) => {
     { name: 'General Ward', nursesPerShift: 3, doctorsPerShift: 1 },
   ];
 
+  const nurses = store.nurses || [];
+
   // 1. Basic Configuration Validity
   if (shiftPerWeek + restDays > 7) {
     issues.push({
@@ -136,10 +138,7 @@ const checkFeasibilityLocally = (store) => {
     }
   });
 
-  // 4. Calculate Total Demand
-  const totalNurseShiftsNeeded = totalNursesPerShift * shiftPerWeek * duration;
-  const totalDoctorShiftsNeeded = totalDoctorsPerShift * shiftPerWeek * duration;
-  const totalShiftsPerWeek = shiftPerWeek;
+  // 4. Calculate Total Demand (will be recalculated with actual shifts)
 
   // 5. Rest and Consecutive Shift Checks
   const maxConsec = maxConsecutiveShifts ?? 3;
@@ -163,19 +162,26 @@ const checkFeasibilityLocally = (store) => {
     });
   }
 
-  // Summary calculations
+  // Summary calculations - dailyShiftSlots is shifts per day, multiply by 7 for weekly
+  const shiftsPerDay = timeSlots.length || 2;
+  const shiftsPerWeekConfigured = shiftsPerDay * 7; // 7 days in a week
+  
+  // Total shifts needed = nurses per shift × actual shifts per week (not shifts per person)
+  const totalNurseShiftsNeeded = totalNursesPerShift * shiftsPerWeekConfigured * duration;
+  const totalDoctorShiftsNeeded = totalDoctorsPerShift * shiftsPerWeekConfigured * duration;
+
   const totalNursesNeeded = Math.ceil(
-    totalNurseShiftsNeeded / (shiftDuration / 12 * 3)
+    totalNurseShiftsNeeded / shiftPerWeek
   );
   const totalDoctorsNeeded = Math.ceil(
-    totalDoctorShiftsNeeded / (shiftDuration / 12 * 3)
+    totalDoctorShiftsNeeded / shiftPerWeek
   );
 
   info.push({
     type: 'info',
     category: 'summary',
-    message: `Weekly requirement: ${totalNurseShiftsNeeded} nurse-shifts and ${totalDoctorShiftsNeeded} doctor-shifts`,
-    suggestion: `Plan to have approximately ${totalNursesNeeded} nurses and ${totalDoctorsNeeded} doctors (assuming 3 shifts/week each)`,
+    message: `Weekly requirement: ${totalNurseShiftsNeeded} nurse-shifts (${shiftsPerWeekConfigured} shifts needed) and ${totalDoctorShiftsNeeded} doctor-shifts`,
+    suggestion: `With ${shiftPerWeek} shifts per person per week, you need approximately ${totalNursesNeeded} nurses and ${totalDoctorsNeeded} doctors`,
   });
 
   info.push({
@@ -201,6 +207,16 @@ const checkFeasibilityLocally = (store) => {
     });
   }
 
+  // Check if enough nurses available
+  if (nurses.length > 0 && nurses.length < totalNursesNeeded) {
+    warnings.push({
+      type: 'warning',
+      category: 'staffing',
+      message: `Not enough nurses: you have ${nurses.length} but need approximately ${totalNursesNeeded} for full coverage`,
+      suggestion: 'Add more nurses to your Nurses section or increase shifts per week',
+    });
+  }
+
   // Determine overall status
   const isFeasible = issues.length === 0;
 
@@ -211,13 +227,15 @@ const checkFeasibilityLocally = (store) => {
     info,
     summary: {
       totalDepartments: departments.length,
+      totalNursesAvailable: nurses.length,
       totalNursesPerShift,
       totalDoctorsPerShift,
       totalNurseShiftsNeeded,
       totalDoctorShiftsNeeded,
-      totalShiftsPerWeek,
+      totalShiftsPerWeek: shiftsPerWeekConfigured,
+      shiftsPerDay: shiftsPerDay,
+      shiftsPerNursePerWeek: shiftPerWeek,
       shiftModel,
-      shiftPerWeek,
       restDays,
       duration,
       estimatedNursesNeeded: totalNursesNeeded,
@@ -236,6 +254,7 @@ export const useLocalFeasibilityCheck = () => {
   const minRestHours = useHospitalConfigStore((state) => state.minRestHours);
   const selectedRestPattern = useHospitalConfigStore((state) => state.selectedRestPattern);
   const departments = useHospitalConfigStore((state) => state.departments);
+  const nurses = useHospitalConfigStore((state) => state.nurses);
 
   console.log('useLocalFeasibilityCheck values:', {
     selectedShiftModel,
@@ -247,6 +266,7 @@ export const useLocalFeasibilityCheck = () => {
     minRestHours,
     selectedRestPattern,
     departments,
+    nurses,
   });
 
   const result = checkFeasibilityLocally({
@@ -259,6 +279,7 @@ export const useLocalFeasibilityCheck = () => {
     minRestHours,
     selectedRestPattern,
     departments,
+    nurses,
   });
 
   return result;
