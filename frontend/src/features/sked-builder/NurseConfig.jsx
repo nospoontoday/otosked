@@ -34,12 +34,13 @@ const NurseConfig = () => {
                         />
 
                         <div className="flex items-center gap-1">
-                            <span className="text-[9px] text-slate-400">Hrs</span>
+                            <span className="text-[9px] text-slate-400">Shifts</span>
                             <input
                                 type="number"
                                 min="0"
-                                value={nurse.maxHoursPerWeek}
-                                onChange={(e) => updateNurse(index, 'maxHoursPerWeek', parseInt(e.target.value) || 0)}
+                                step="0.5"
+                                value={nurse.maxShiftsPerWeek}
+                                onChange={(e) => updateNurse(index, 'maxShiftsPerWeek', parseFloat(e.target.value) || 0)}
                                 className="w-12 bg-white border border-slate-200 rounded px-1 py-1 text-xs text-center focus:ring-1 focus:ring-indigo-300 focus:outline-none"
                             />
                         </div>

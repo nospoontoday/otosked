@@ -170,6 +170,13 @@ const checkFeasibilityLocally = (store) => {
   const totalNurseShiftsNeeded = totalNursesPerShift * shiftsPerWeekConfigured * duration;
   const totalDoctorShiftsNeeded = totalDoctorsPerShift * shiftsPerWeekConfigured * duration;
 
+  // Calculate total shifts available from nurses (sum of maxShiftsPerWeek)
+  const totalShiftsAvailableFromNurses = nurses.reduce((sum, n) => sum + (n.maxShiftsPerWeek || 3), 0);
+
+  // Calculate nurses' shift preferences
+  const nursesPreferringDay = nurses.filter(n => n.shiftPreference === 'day').length;
+  const nursesPreferringNight = nurses.filter(n => n.shiftPreference === 'night').length;
+
   const totalNursesNeeded = Math.ceil(
     totalNurseShiftsNeeded / shiftPerWeek
   );
@@ -180,8 +187,8 @@ const checkFeasibilityLocally = (store) => {
   info.push({
     type: 'info',
     category: 'summary',
-    message: `Weekly requirement: ${totalNurseShiftsNeeded} nurse-shifts (${shiftsPerWeekConfigured} shifts needed) and ${totalDoctorShiftsNeeded} doctor-shifts`,
-    suggestion: `With ${shiftPerWeek} shifts per person per week, you need approximately ${totalNursesNeeded} nurses and ${totalDoctorsNeeded} doctors`,
+    message: `Weekly requirement: ${totalNurseShiftsNeeded} nurse-shifts (${shiftsPerWeekConfigured} shifts needed)`,
+    suggestion: `With ${shiftPerWeek} shifts per person per week, you need approximately ${totalNursesNeeded} nurses`,
   });
 
   info.push({
@@ -207,7 +214,7 @@ const checkFeasibilityLocally = (store) => {
     });
   }
 
-  // Check if enough nurses available
+  // Check if enough nurses available (based on count)
   if (nurses.length > 0 && nurses.length < totalNursesNeeded) {
     warnings.push({
       type: 'warning',
@@ -216,6 +223,18 @@ const checkFeasibilityLocally = (store) => {
       suggestion: 'Add more nurses to your Nurses section or increase shifts per week',
     });
   }
+
+  // Check if enough total shifts available from nurses
+  if (nurses.length > 0 && totalShiftsAvailableFromNurses < totalNurseShiftsNeeded) {
+    warnings.push({
+      type: 'warning',
+      category: 'staffing',
+      message: `Not enough nurse shifts available: nurses can work ${totalShiftsAvailableFromNurses} shifts/week but need ${totalNurseShiftsNeeded}`,
+      suggestion: 'Increase max shifts per week for existing nurses or add more nurses',
+    });
+  }
+
+  // Shift preferences are soft constraints - GA will prioritize preferences but can assign nurses to any shift
 
   // Determine overall status
   const isFeasible = issues.length === 0;
@@ -232,8 +251,11 @@ const checkFeasibilityLocally = (store) => {
       totalDoctorsPerShift,
       totalNurseShiftsNeeded,
       totalDoctorShiftsNeeded,
-      totalShiftsPerWeek: shiftsPerWeekConfigured,
+      totalShiftsAvailableFromNurses,
+      nursesPreferringDay,
+      nursesPreferringNight,
       shiftsPerDay: shiftsPerDay,
+      totalShiftsPerWeek: shiftsPerWeekConfigured,
       shiftsPerNursePerWeek: shiftPerWeek,
       shiftModel,
       restDays,

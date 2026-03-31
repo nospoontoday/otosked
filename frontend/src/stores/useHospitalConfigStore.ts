@@ -26,9 +26,9 @@ export const useHospitalConfigStore = create((set, get) => ({
   ],
 
   nurses: [
-    { name: "Nurse 1", maxHoursPerWeek: 48, shiftPreference: "day" },
-    { name: "Nurse 2", maxHoursPerWeek: 48, shiftPreference: "day" },
-    { name: "Nurse 3", maxHoursPerWeek: 48, shiftPreference: "day" },
+    { name: "Nurse 1", maxShiftsPerWeek: 3, shiftPreference: "day" },
+    { name: "Nurse 2", maxShiftsPerWeek: 3, shiftPreference: "day" },
+    { name: "Nurse 3", maxShiftsPerWeek: 3, shiftPreference: "day" },
   ],
 
   addDepartment: () =>
@@ -55,7 +55,7 @@ export const useHospitalConfigStore = create((set, get) => ({
     set((state) => ({
       nurses: [
         ...state.nurses,
-        { name: "", maxHoursPerWeek: 48, shiftPreference: "day" },
+        { name: "", maxShiftsPerWeek: 3, shiftPreference: "day" },
       ],
     })),
 
@@ -98,9 +98,9 @@ export const useHospitalConfigStore = create((set, get) => ({
       nurses: project.nurses && project.nurses.length > 0
         ? project.nurses
         : [
-            { name: "Nurse 1", maxHoursPerWeek: 48, shiftPreference: "day" },
-            { name: "Nurse 2", maxHoursPerWeek: 48, shiftPreference: "day" },
-            { name: "Nurse 3", maxHoursPerWeek: 48, shiftPreference: "day" },
+            { name: "Nurse 1", maxShiftsPerWeek: 3, shiftPreference: "day" },
+            { name: "Nurse 2", maxShiftsPerWeek: 3, shiftPreference: "day" },
+            { name: "Nurse 3", maxShiftsPerWeek: 3, shiftPreference: "day" },
           ],
     });
   },
@@ -113,14 +113,17 @@ export const useHospitalConfigStore = create((set, get) => ({
       availableShiftModels
     );
 
+    const defaultShiftsPerWeek = defaults.shiftsPerWeek;
+
     set({
       selectedShiftModel: shiftModel,
-      shiftsPerNursePerWeek: defaults.shiftsPerWeek,
+      shiftsPerNursePerWeek: defaultShiftsPerWeek,
       restDaysPerNurse: defaults.restDays,
       dailyShiftSlots: defaults.timeSlots,
       minRestHours: defaults.minRestHours,
       maxNightShiftsPerPeriod: defaults.maxNightShiftsPerPeriod,
       maxConsecutiveShifts: defaults.maxConsecutiveShifts,
+      nurses: get().nurses.map(nurse => ({ ...nurse, maxShiftsPerWeek: defaultShiftsPerWeek })),
     });
   },
 
@@ -176,6 +179,7 @@ export const useHospitalConfigStore = create((set, get) => ({
       maxConsecutiveShifts: computed.maxConsecutiveShifts,
       minRestHours: computed.minRestHours,
       maxNightShiftsPerPeriod: computed.maxNightShiftsPerPeriod,
+      nurses: state.nurses.map(nurse => ({ ...nurse, maxShiftsPerWeek: shifts })),
     });
   },
 

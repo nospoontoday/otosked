@@ -10,7 +10,7 @@ const departmentSchema = new mongoose.Schema({
 
 const nurseSchema = new mongoose.Schema({
     name: { type: String, required: true },
-    maxHoursPerWeek: { type: Number, default: 48 },
+    maxShiftsPerWeek: { type: Number, default: 3 },
     shiftPreference: { type: String, enum: ['day', 'night'], default: 'day' },
 }, { _id: false });
 

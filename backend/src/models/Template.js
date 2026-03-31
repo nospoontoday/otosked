@@ -160,7 +160,7 @@ const departmentSchema = new mongoose.Schema({
 
 const nurseSchema = new mongoose.Schema({
     name: { type: String, required: true },
-    maxHoursPerWeek: { type: Number, default: 48 },
+    maxShiftsPerWeek: { type: Number, default: 3 },
     shiftPreference: { type: String, enum: ['day', 'night'], default: 'day' },
 }, { _id: false });
 
@@ -180,9 +180,9 @@ const templateSchema = new mongoose.Schema({
     nurses: {
         type: [nurseSchema],
         default: [
-            { name: 'Nurse 1', maxHoursPerWeek: 48, shiftPreference: 'day' },
-            { name: 'Nurse 2', maxHoursPerWeek: 48, shiftPreference: 'day' },
-            { name: 'Nurse 3', maxHoursPerWeek: 48, shiftPreference: 'day' },
+            { name: 'Nurse 1', maxShiftsPerWeek: 3, shiftPreference: 'day' },
+            { name: 'Nurse 2', maxShiftsPerWeek: 3, shiftPreference: 'day' },
+            { name: 'Nurse 3', maxShiftsPerWeek: 3, shiftPreference: 'day' },
         ],
     },
     resourceTypes: [resourceTypeSchema],

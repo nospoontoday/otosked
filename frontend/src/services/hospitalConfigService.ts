@@ -78,6 +78,11 @@ export const hospitalConfigService = {
         { name: "ER", nursesPerShift: 2, doctorsPerShift: 1 },
         { name: "General Ward", nursesPerShift: 3, doctorsPerShift: 1 },
       ],
+      nurses: project.nurses || [
+        { name: "Nurse 1", maxShiftsPerWeek: 3, shiftPreference: "day" },
+        { name: "Nurse 2", maxShiftsPerWeek: 3, shiftPreference: "day" },
+        { name: "Nurse 3", maxShiftsPerWeek: 3, shiftPreference: "day" },
+      ],
       restDaysPerNurse: project.restDays ?? config?.restDays ?? (7 - (project.shiftPerWeek || 3)),
       maxConsecutiveShifts: project.maxConsecutiveShifts ?? config?.maxConsecutiveShifts ?? (project.shiftPerWeek || 3),
       minRestHours: project.minRestHours ?? config?.minRestHours ?? 12,
