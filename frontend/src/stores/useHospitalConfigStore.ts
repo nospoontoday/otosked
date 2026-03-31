@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { hospitalConfigService } from '../services/hospitalConfigService';
 import { hospitalConfigApi } from '../services/hospitalConfigApi';
 import { mapStateToPayload } from '../services/hospitalConfigMapper';
+import { updateProject } from '../api/projects';
 
 export const useHospitalConfigStore = create((set, get) => ({
   // state
@@ -23,12 +24,19 @@ export const useHospitalConfigStore = create((set, get) => ({
 
     const payload = mapStateToPayload(state);
 
-    await hospitalConfigApi.save(payload);
+    if (!state.projectId) {
+      throw new Error('projectId is required to save config');
+    }
+
+    await updateProject(state.projectId, payload);
   },
 
   initializeFromProject: (project) => {
     const mapped = hospitalConfigService.mapProjectToState(project);
-    set(mapped);
+    set({
+      ...mapped,
+      projectId: project._id || project.id, // whichever field is used
+    });
   },
 
   selectShiftModel: (shiftModel) => {
@@ -86,6 +94,24 @@ export const useHospitalConfigStore = create((set, get) => ({
 
   selectRestPattern: (pattern) =>
     set({ selectedRestPattern: pattern }),
+
+  setShiftsPerNursePerWeek: (shifts) => {
+    const state = get();
+
+    const computed = hospitalConfigService.computeRestSettings({
+      shiftsPerWeek: shifts,
+      selectedShiftModel: state.selectedShiftModel,
+      availableShiftModels: state.availableShiftModels,
+    });
+
+    set({
+      shiftsPerNursePerWeek: shifts,
+      restDaysPerNurse: computed.restDays,
+      maxConsecutiveShifts: computed.maxConsecutiveShifts,
+      minRestHours: computed.minRestHours,
+      maxNightShiftsPerPeriod: computed.maxNightShiftsPerPeriod,
+    });
+  },
 
   getStaffingMetrics: () => {
     const { shiftsPerNursePerWeek, dailyShiftSlots, restDaysPerNurse } = get();

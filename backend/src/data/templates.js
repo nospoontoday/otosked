@@ -7,6 +7,11 @@ const templates = {
     key: 'hospital',
     name: 'Hospital Shifts',
     description: 'Allocate doctors, nurses, and staff to departments across rotating shifts.',
+    departments: [
+      { name: 'ICU', nursesPerShift: 1, doctorsPerShift: 1 },
+      { name: 'ER', nursesPerShift: 2, doctorsPerShift: 1 },
+      { name: 'General Ward', nursesPerShift: 3, doctorsPerShift: 1 },
+    ],
     timeConfig: {
       start_time: '07:00',
       end_time: '19:00',

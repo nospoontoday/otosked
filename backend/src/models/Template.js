@@ -152,11 +152,25 @@ const restPatternSchema = new mongoose.Schema({
   },
 }, { _id: false });
 
+const departmentSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    nursesPerShift: { type: Number, default: 1 },
+    doctorsPerShift: { type: Number, default: 1 },
+}, { _id: false });
+
 const templateSchema = new mongoose.Schema({
     key: { type: String, required: true, unique: true},
     name: { type: String, required: true },
     description: { type: String },
     timeConfig: { type: timeConfigSchema, default: () => ({}) },
+    departments: {
+        type: [departmentSchema],
+        default: [
+            { name: "ICU", nursesPerShift: 1, doctorsPerShift: 1 },
+            { name: "ER", nursesPerShift: 2, doctorsPerShift: 1 },
+            { name: "General Ward", nursesPerShift: 3, doctorsPerShift: 1 }
+        ],
+    },
     resourceTypes: [resourceTypeSchema],
     restPatterns: {
         type: [restPatternSchema],

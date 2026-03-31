@@ -70,8 +70,8 @@ export const hospitalConfigService = {
       selectedShiftModel: shiftModel,
       selectedRestPattern: restPattern,
       shiftsPerNursePerWeek: project.shiftPerWeek || 3,
-      scheduleLengthWeeks: project.template.duration || 1,
-      dailyShiftSlots: config?.timeSlots || [],
+      scheduleLengthWeeks: project.duration || project.template.duration || 1,
+      dailyShiftSlots: project.timeSlots || config?.timeSlots || [],
       availableShiftModels: project.template.shiftConfigs,
     };
   },
