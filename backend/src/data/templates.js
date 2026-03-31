@@ -12,6 +12,11 @@ const templates = {
       { name: 'ER', nursesPerShift: 2, doctorsPerShift: 1 },
       { name: 'General Ward', nursesPerShift: 3, doctorsPerShift: 1 },
     ],
+    nurses: [
+      { name: 'Nurse 1', maxHoursPerWeek: 48, shiftPreference: 'day' },
+      { name: 'Nurse 2', maxHoursPerWeek: 48, shiftPreference: 'day' },
+      { name: 'Nurse 3', maxHoursPerWeek: 48, shiftPreference: 'day' },
+    ],
     timeConfig: {
       start_time: '07:00',
       end_time: '19:00',

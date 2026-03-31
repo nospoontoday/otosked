@@ -8,6 +8,12 @@ const departmentSchema = new mongoose.Schema({
     doctorsPerShift: { type: Number, default: 1 },
 }, { _id: false });
 
+const nurseSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    maxHoursPerWeek: { type: Number, default: 48 },
+    shiftPreference: { type: String, enum: ['day', 'night'], default: 'day' },
+}, { _id: false });
+
 const demandSlotSchema = new mongoose.Schema({
   slot_id: { type: String, required: true },
   timeslot_id: { type: String, required: true },
@@ -29,6 +35,10 @@ const projectSchema = new mongoose.Schema({
   timeSlots: [timeSlotSchema],
   departments: {
     type: [departmentSchema],
+    default: [],
+  },
+  nurses: {
+    type: [nurseSchema],
     default: [],
   },
   demandSlots: [demandSlotSchema],

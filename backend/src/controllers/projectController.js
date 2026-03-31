@@ -73,6 +73,7 @@ const store = async (req, res) => {
       restDays,
       duration: defaultDuration,
       departments: template.departments || [],
+      nurses: template.nurses || [],
     });
 
     return res.status(201).json(project);
