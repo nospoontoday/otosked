@@ -1,18 +1,6 @@
-import { AlertCircle, CheckCircle, AlertTriangle, Info, RefreshCw } from 'lucide-react';
+import { AlertCircle, CheckCircle, AlertTriangle, Info } from 'lucide-react';
 
-const FeasibilityReport = ({ feasibility, isLoading, onRefresh }) => {
-  if (isLoading) {
-    return (
-      <div className="bg-white rounded-xl border border-slate-200 p-6">
-        <div className="animate-pulse space-y-3">
-          <div className="h-6 w-40 bg-slate-200 rounded" />
-          <div className="h-4 w-full bg-slate-200 rounded" />
-          <div className="h-4 w-3/4 bg-slate-200 rounded" />
-        </div>
-      </div>
-    );
-  }
-
+const FeasibilityReport = ({ feasibility }) => {
   if (!feasibility) {
     return null;
   }
@@ -22,7 +10,7 @@ const FeasibilityReport = ({ feasibility, isLoading, onRefresh }) => {
   return (
     <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
       {/* Header */}
-      <div className={`px-6 py-4 border-b flex items-center justify-between ${
+      <div className={`px-6 py-4 border-b ${
         isFeasible ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
       }`}>
         <div className="flex items-center gap-3">
@@ -42,15 +30,6 @@ const FeasibilityReport = ({ feasibility, isLoading, onRefresh }) => {
             </p>
           </div>
         </div>
-        {onRefresh && (
-          <button
-            onClick={onRefresh}
-            className="p-2 hover:bg-slate-100 rounded-lg transition"
-            title="Refresh feasibility check"
-          >
-            <RefreshCw className="w-4 h-4 text-slate-500" />
-          </button>
-        )}
       </div>
 
       {/* Summary Card */}

@@ -2,10 +2,13 @@ import { ChevronRight } from "lucide-react";
 import HospitalConfig from "./HospitalConfig";
 import SchoolConfig from "./SchoolConfig";
 import FeasibilityReport from "../../components/FeasibilityReport";
+import { useLocalFeasibilityCheck } from "../../hooks/useLocalFeasibilityCheck";
 
-const SchemaBuilder = ({templateKey, project, feasibility, isFeasibilityLoading, onFeasibilityRefresh}) => {
+const SchemaBuilder = ({templateKey, project}) => {
     const isUniversity = templateKey === 'university';
     const isHospital = templateKey === 'hospital';
+
+    const feasibility = useLocalFeasibilityCheck();
 
     return (
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -45,11 +48,11 @@ const SchemaBuilder = ({templateKey, project, feasibility, isFeasibilityLoading,
                     )}
                 </div>
                 <div className="w-full md:w-2/3 p-6 max-h-[80vh] overflow-y-auto">
-                    <FeasibilityReport 
-                        feasibility={feasibility} 
-                        isLoading={isFeasibilityLoading}
-                        onRefresh={onFeasibilityRefresh}
-                    />
+                    {feasibility ? (
+                        <FeasibilityReport feasibility={feasibility} />
+                    ) : (
+                        <div className="p-4 bg-yellow-100 rounded">Loading feasibility...</div>
+                    )}
                 </div>
             </div>
         </div>
