@@ -7,6 +7,16 @@ const templates = {
     key: 'hospital',
     name: 'Hospital Shifts',
     description: 'Allocate doctors, nurses, and staff to departments across rotating shifts.',
+    departments: [
+      { name: 'ICU', nursesPerShift: 1, doctorsPerShift: 1 },
+      { name: 'ER', nursesPerShift: 2, doctorsPerShift: 1 },
+      { name: 'General Ward', nursesPerShift: 3, doctorsPerShift: 1 },
+    ],
+    nurses: [
+      { name: 'Nurse 1', maxShiftsPerWeek: 3, shiftPreference: 'day', availableDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] },
+      { name: 'Nurse 2', maxShiftsPerWeek: 3, shiftPreference: 'day', availableDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] },
+      { name: 'Nurse 3', maxShiftsPerWeek: 3, shiftPreference: 'day', availableDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] },
+    ],
     timeConfig: {
       start_time: '07:00',
       end_time: '19:00',

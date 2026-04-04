@@ -70,9 +70,23 @@ export const hospitalConfigService = {
       selectedShiftModel: shiftModel,
       selectedRestPattern: restPattern,
       shiftsPerNursePerWeek: project.shiftPerWeek || 3,
-      scheduleLengthWeeks: project.template.duration || 1,
-      dailyShiftSlots: config?.timeSlots || [],
+      scheduleLengthWeeks: project.duration || project.template.duration || 1,
+      dailyShiftSlots: project.timeSlots || config?.timeSlots || [],
       availableShiftModels: project.template.shiftConfigs,
+      departments: project.departments || [
+        { name: "ICU", nursesPerShift: 1, doctorsPerShift: 1 },
+        { name: "ER", nursesPerShift: 2, doctorsPerShift: 1 },
+        { name: "General Ward", nursesPerShift: 3, doctorsPerShift: 1 },
+      ],
+      nurses: project.nurses || [
+        { name: "Nurse 1", maxShiftsPerWeek: 3, shiftPreference: "day", availableDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] },
+        { name: "Nurse 2", maxShiftsPerWeek: 3, shiftPreference: "day", availableDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] },
+        { name: "Nurse 3", maxShiftsPerWeek: 3, shiftPreference: "day", availableDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] },
+      ],
+      restDaysPerNurse: project.restDays ?? config?.restDays ?? (7 - (project.shiftPerWeek || 3)),
+      maxConsecutiveShifts: project.maxConsecutiveShifts ?? config?.maxConsecutiveShifts ?? (project.shiftPerWeek || 3),
+      minRestHours: project.minRestHours ?? config?.minRestHours ?? 12,
+      maxNightShiftsPerPeriod: project.maxNightShiftsPerPeriod ?? config?.maxNightShiftsPerPeriod ?? 4,
     };
   },
 };

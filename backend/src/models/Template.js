@@ -152,11 +152,40 @@ const restPatternSchema = new mongoose.Schema({
   },
 }, { _id: false });
 
+const departmentSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    nursesPerShift: { type: Number, default: 1 },
+    doctorsPerShift: { type: Number, default: 1 },
+}, { _id: false });
+
+const nurseSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    maxShiftsPerWeek: { type: Number, default: 3 },
+    shiftPreference: { type: String, enum: ['day', 'night'], default: 'day' },
+    availableDays: { type: [String], default: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] },
+}, { _id: false });
+
 const templateSchema = new mongoose.Schema({
     key: { type: String, required: true, unique: true},
     name: { type: String, required: true },
     description: { type: String },
     timeConfig: { type: timeConfigSchema, default: () => ({}) },
+    departments: {
+        type: [departmentSchema],
+        default: [
+            { name: "ICU", nursesPerShift: 1, doctorsPerShift: 1 },
+            { name: "ER", nursesPerShift: 2, doctorsPerShift: 1 },
+            { name: "General Ward", nursesPerShift: 3, doctorsPerShift: 1 }
+        ],
+    },
+    nurses: {
+        type: [nurseSchema],
+        default: [
+            { name: 'Nurse 1', maxShiftsPerWeek: 3, shiftPreference: 'day', availableDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] },
+            { name: 'Nurse 2', maxShiftsPerWeek: 3, shiftPreference: 'day', availableDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] },
+            { name: 'Nurse 3', maxShiftsPerWeek: 3, shiftPreference: 'day', availableDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] },
+        ],
+    },
     resourceTypes: [resourceTypeSchema],
     restPatterns: {
         type: [restPatternSchema],

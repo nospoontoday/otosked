@@ -2,6 +2,19 @@ import mongoose from 'mongoose';
 import { timeSlotSchema } from './Template.js';
 
 
+const departmentSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    nursesPerShift: { type: Number, default: 1 },
+    doctorsPerShift: { type: Number, default: 1 },
+}, { _id: false });
+
+const nurseSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    maxShiftsPerWeek: { type: Number, default: 3 },
+    shiftPreference: { type: String, enum: ['day', 'night'], default: 'day' },
+    availableDays: { type: [String], default: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] },
+}, { _id: false });
+
 const demandSlotSchema = new mongoose.Schema({
   slot_id: { type: String, required: true },
   timeslot_id: { type: String, required: true },
@@ -21,6 +34,14 @@ const projectSchema = new mongoose.Schema({
   shiftPerWeek: { type: Number, required: true },
   restDays: { type: Number, required: true, default: 0 },
   timeSlots: [timeSlotSchema],
+  departments: {
+    type: [departmentSchema],
+    default: [],
+  },
+  nurses: {
+    type: [nurseSchema],
+    default: [],
+  },
   demandSlots: [demandSlotSchema],
   maxConsecutiveShifts: { type: Number, default: 0 },
   minRestHours: { type: Number, default: 0 },

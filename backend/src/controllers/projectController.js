@@ -1,11 +1,33 @@
 
 import Project from '../models/Project.js';
 import Template from '../models/Template.js';
+import { checkFeasibility } from '../services/feasibilityService.js';
 
 const index = async (_req, res) => {
   try {
     const projects = await Project.find().populate('template');
     return res.status(200).json(projects);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+};
+
+const checkFeasibilityHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    let project;
+    if (id) {
+      project = await Project.findById(id).populate('template');
+      if (!project) {
+        return res.status(404).json({ message: 'Project not found' });
+      }
+    } else {
+      project = req.body;
+    }
+
+    const result = checkFeasibility(project);
+    return res.status(200).json(result);
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
@@ -50,6 +72,8 @@ const store = async (req, res) => {
       demandSlots: [],
       restDays,
       duration: defaultDuration,
+      departments: template.departments || [],
+      nurses: template.nurses || [],
     });
 
     return res.status(201).json(project);
@@ -80,13 +104,16 @@ const update = async (req, res) => {
     const { id } = req.params;
     const {
       shiftModel,
-      shiftPerWeek,
-      restPattern,
+      shiftsPerWeek: shiftPerWeek,
+      selectedRestPattern: restPattern,
       restDays,
       maxConsecutiveShifts,
       minRestHours,
       maxNightShiftsPerPeriod,
-      scheduleLengthWeeks,
+      scheduleLengthWeeks: duration,
+      dailyShiftSlots: timeSlots,
+      departments,
+      nurses,
     } = req.body;
 
     const project = await Project.findByIdAndUpdate(
@@ -99,20 +126,24 @@ const update = async (req, res) => {
         maxConsecutiveShifts,
         minRestHours,
         maxNightShiftsPerPeriod,
-        duration: scheduleLengthWeeks,
+        duration,
+        timeSlots,
+        departments,
+        nurses,
       },
       { new: true, runValidators: true }
-    ).populate('template');
+    );
 
     if (!project) {
       return res.status(404).json({ message: 'Project not found' });
     }
 
     return res.status(200).json(project);
+    // return res.status(200).json({ message: 'Project updated successfully' });
   } catch (err) {
     console.error('Error updating project:', err);
     return res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
 
-export { index, store, show, update };
+export { index, store, show, update, checkFeasibilityHandler };

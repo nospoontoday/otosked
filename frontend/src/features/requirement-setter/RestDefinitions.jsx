@@ -56,8 +56,8 @@ const RestDefinitions = ({ restDaysPerNurse }) => {
                         onChange={e => selectRestPattern(e.target.value)}
                         className="flex-1 bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs focus:ring-1 focus:ring-indigo-300 focus:outline-none"
                     >
-                    <option value="scattered">Scattered (spread out)</option>
-                    <option value="fixed">Fixed Together (consecutive)</option>
+                      <option value="spread">Scattered (spread out)</option>
+                      <option value="consecutive">Fixed Together (consecutive)</option>
                     </select>
                 </div>
 

@@ -15,6 +15,8 @@ const fieldsToWatch = [
   'selectedRestPattern',
   'scheduleLengthWeeks',
   'dailyShiftSlots',
+  'departments',
+  'nurses',
 ];
 
 export const setupHospitalConfigAutoSave = () => {
