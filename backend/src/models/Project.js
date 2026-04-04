@@ -12,6 +12,7 @@ const nurseSchema = new mongoose.Schema({
     name: { type: String, required: true },
     maxShiftsPerWeek: { type: Number, default: 3 },
     shiftPreference: { type: String, enum: ['day', 'night'], default: 'day' },
+    availableDays: { type: [String], default: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] },
 }, { _id: false });
 
 const demandSlotSchema = new mongoose.Schema({

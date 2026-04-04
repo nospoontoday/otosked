@@ -162,6 +162,7 @@ const nurseSchema = new mongoose.Schema({
     name: { type: String, required: true },
     maxShiftsPerWeek: { type: Number, default: 3 },
     shiftPreference: { type: String, enum: ['day', 'night'], default: 'day' },
+    availableDays: { type: [String], default: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] },
 }, { _id: false });
 
 const templateSchema = new mongoose.Schema({
@@ -180,9 +181,9 @@ const templateSchema = new mongoose.Schema({
     nurses: {
         type: [nurseSchema],
         default: [
-            { name: 'Nurse 1', maxShiftsPerWeek: 3, shiftPreference: 'day' },
-            { name: 'Nurse 2', maxShiftsPerWeek: 3, shiftPreference: 'day' },
-            { name: 'Nurse 3', maxShiftsPerWeek: 3, shiftPreference: 'day' },
+            { name: 'Nurse 1', maxShiftsPerWeek: 3, shiftPreference: 'day', availableDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] },
+            { name: 'Nurse 2', maxShiftsPerWeek: 3, shiftPreference: 'day', availableDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] },
+            { name: 'Nurse 3', maxShiftsPerWeek: 3, shiftPreference: 'day', availableDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] },
         ],
     },
     resourceTypes: [resourceTypeSchema],
