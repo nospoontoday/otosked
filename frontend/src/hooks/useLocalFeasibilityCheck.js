@@ -236,8 +236,239 @@ const checkFeasibilityLocally = (store) => {
 
   // Shift preferences are soft constraints - GA will prioritize preferences but can assign nurses to any shift
 
+  // 6. Nurse Availability Checks (days and hours)
+  const allDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  
+  // Calculate available nurses per day (factoring in maxShiftsPerWeek) - available even if no nurses
+  const nursesPerDay = {};
+  const shiftsAvailablePerDay = {};
+  
+  allDays.forEach(day => {
+    const availableNurses = nurses.filter(nurse => {
+      const days = nurse.availableDays || [];
+      return days.includes(day);
+    });
+    nursesPerDay[day] = availableNurses.length;
+    shiftsAvailablePerDay[day] = availableNurses.reduce((sum, n) => sum + (n.maxShiftsPerWeek || 3), 0);
+  });
+
+  if (nurses.length === 0) {
+    issues.push({
+      type: 'error',
+      category: 'nurses',
+      message: 'No nurses defined',
+      suggestion: 'Add at least one nurse to the project',
+    });
+  } else {
+    // Check each nurse's availability
+    nurses.forEach((nurse, index) => {
+      const nurseName = nurse.name || `Nurse ${index + 1}`;
+      
+      // Check available days
+      const availableDays = nurse.availableDays || [];
+      if (availableDays.length === 0) {
+        issues.push({
+          type: 'error',
+          category: 'nurses',
+          message: `${nurseName} has no available days set`,
+          suggestion: `Set available days for ${nurseName} or use all days`,
+        });
+      }
+      
+      // Check if nurse has any time restrictions
+      if (nurse.availableStartTime || nurse.availableEndTime) {
+        if (!nurse.availableStartTime || !nurse.availableEndTime) {
+          warnings.push({
+            type: 'warning',
+            category: 'nurses',
+            message: `${nurseName} has partial time availability set (only start or end time)`,
+            suggestion: `Set both start and end time for ${nurseName} or leave both empty`,
+          });
+        }
+      }
+    });
+
+    // Hours availability feasibility check
+    nurses.forEach((nurse) => {
+      if (nurse.availableStartTime && nurse.availableEndTime) {
+        const nurseTimeStart = parseInt(nurse.availableStartTime.replace(':', ''));
+        const nurseTimeEnd = parseInt(nurse.availableEndTime.replace(':', ''));
+        
+        timeSlots.forEach(slot => {
+          if (!slot.start || !slot.end) return;
+          
+          let slotStart = parseInt(slot.start.replace(':', ''));
+          let slotEnd = parseInt(slot.end.replace(':', ''));
+          
+          // Handle overnight shifts (e.g., 19:00 to 07:00)
+          if (slotEnd < slotStart) {
+            slotEnd += 2400;
+          }
+          if (nurseTimeEnd < nurseTimeStart) {
+            // nurse overnight availability not supported well, skip
+            return;
+          }
+          
+          const slotOverlaps = slotStart >= nurseTimeStart && slotEnd <= nurseTimeEnd;
+          
+          if (!slotOverlaps) {
+            warnings.push({
+              type: 'warning',
+              category: 'nurses',
+              message: `Nurse "${nurse.name}" availability (${nurse.availableStartTime}-${nurse.availableEndTime}) may not cover "${slot.label}"`,
+              suggestion: `Adjust hours for ${nurse.name} or the shift time`,
+            });
+          }
+        });
+      }
+    });
+
+    // Check if we have enough nurses for each day (using pre-calculated values above)
+    const minNursesNeeded = totalNursesPerShift;
+    const minShiftsPerDay = totalNursesPerShift * shiftsPerDay;
+    
+    allDays.forEach(day => {
+      const availableCount = nursesPerDay[day];
+      const shiftsCount = shiftsAvailablePerDay[day];
+      
+      if (availableCount < minNursesNeeded) {
+        issues.push({
+          type: 'error',
+          category: 'nurses',
+          message: `Only ${availableCount} nurse(s) available on ${day} (need ${minNursesNeeded})`,
+          suggestion: `Add more nurses with ${day} in their availability or reduce staffing requirements`,
+        });
+      } else if (shiftsCount < minShiftsPerDay) {
+        issues.push({
+          type: 'error',
+          category: 'nurses',
+          message: `Available shifts (${shiftsCount}) on ${day} less than needed (${minShiftsPerDay})`,
+          suggestion: `Nurses available on ${day} can't cover all shifts`,
+        });
+      } else if (availableCount < minNursesNeeded + 2) {
+        warnings.push({
+          type: 'warning',
+          category: 'nurses',
+          message: `Only ${availableCount} nurse(s) available on ${day} - tight staffing`,
+          suggestion: 'Consider adding more nurses for flexibility',
+        });
+      }
+    });
+
+    // Summary of nurse availability
+    const totalNurseCapacity = nurses.reduce((sum, n) => {
+      const maxShifts = n.maxShiftsPerWeek || 3;
+      return sum + maxShifts;
+    }, 0);
+    
+    const maxPossibleShifts = totalNurseCapacity;
+    
+    if (maxPossibleShifts < totalNurseShiftsNeeded && totalNursesPerShift > 0) {
+      issues.push({
+        type: 'error',
+        category: 'nurses',
+        message: `Insufficient total nurse availability: can cover ${maxPossibleShifts} shifts but need ${totalNurseShiftsNeeded}`,
+        suggestion: 'Add more nurses or expand their available days',
+      });
+    } else if (totalNursesPerShift > 0) {
+      info.push({
+        type: 'info',
+        category: 'nurses',
+        message: `Nurse availability: ${nurses.length} nurse(s) with combined capacity of ${maxPossibleShifts} shifts/week`,
+        suggestion: `Capacity is sufficient for ${totalNurseShiftsNeeded} required shifts`,
+      });
+    }
+  }
+
   // Determine overall status
   const isFeasible = issues.length === 0;
+
+  // Group shifts by type (Day vs Night) based on start time
+  // Day shift: starts between 6am-12pm, Night shift: starts between 6pm-12am
+  const shiftTypes = {};
+  
+  timeSlots.forEach(slot => {
+    if (!slot.start || !slot.end) return;
+    
+    const startHour = parseInt(slot.start.split(':')[0]);
+    const isDayShift = startHour >= 6 && startHour < 18;
+    const shiftType = isDayShift ? 'Day' : 'Night';
+    const timeLabel = `${slot.start} - ${slot.end}`;
+    
+    if (!shiftTypes[shiftType]) {
+      shiftTypes[shiftType] = {
+        type: shiftType,
+        timeLabel: timeLabel,
+        slots: []
+      };
+    }
+    shiftTypes[shiftType].slots.push(slot);
+  });
+
+  // Calculate nurses available for each shift type (considering time availability)
+  const nursesPerShiftType = {};
+  
+  Object.entries(shiftTypes).forEach(([shiftType, config]) => {
+    const { timeLabel, slots } = config;
+    
+    // Count nurses available for ANY slot of this shift type
+    // A nurse is available for Day shift if they can work at least one Day slot
+    const availableNurses = nurses.filter(nurse => {
+      // Must have at least one day available
+      if (!nurse.availableDays || nurse.availableDays.length === 0) return false;
+      
+      // If no time restriction, nurse is available anytime
+      if (!nurse.availableStartTime && !nurse.availableEndTime) return true;
+      if (!nurse.availableStartTime || !nurse.availableEndTime) return false;
+      
+      // Check if nurse's time availability covers the shift type
+      const nurseStart = parseInt(nurse.availableStartTime.replace(':', ''));
+      const nurseEnd = parseInt(nurse.availableEndTime.replace(':', ''));
+      
+      // Check against each slot of this shift type
+      for (const slot of slots) {
+        if (!slot.start || !slot.end) continue;
+        
+        let slotStart = parseInt(slot.start.replace(':', ''));
+        let slotEnd = parseInt(slot.end.replace(':', ''));
+        
+        // For a nurse to be available for a shift, their hours must FULLY cover the shift
+        // This ensures the nurse can work the entire shift duration
+        const nurseCoversShift = nurseStart <= slotStart && nurseEnd >= slotEnd;
+        
+        if (nurseCoversShift) {
+          return true; // Nurse can work at least one slot of this type
+        }
+      }
+      
+      return false;
+    });
+    
+    // Calculate shift capacity: sum of maxShiftsPerWeek for all available nurses
+    const shiftCapacity = availableNurses.reduce((sum, n) => sum + (n.maxShiftsPerWeek || 3), 0);
+    
+    nursesPerShiftType[shiftType] = {
+      type: shiftType,
+      timeLabel,
+      shiftCapacity,
+      nurseCount: availableNurses.length,
+      nurseNames: availableNurses.map(n => n.name || 'Unnamed')
+    };
+  });
+
+  // Calculate total shift capacity from all nurses (regardless of shift type availability)
+  const totalShiftCapacityAllNurses = nurses.reduce((sum, n) => {
+    const days = n.availableDays || [];
+    return sum + (days.length > 0 ? (n.maxShiftsPerWeek || 3) : 0);
+  }, 0);
+
+  const nursesPerDaySummary = {};
+  allDays.forEach(day => {
+    nursesPerDaySummary[day] = {
+      nurseCount: nursesPerDay[day],
+      shiftCapacity: shiftsAvailablePerDay[day]
+    };
+  });
 
   return {
     isFeasible,
@@ -246,7 +477,7 @@ const checkFeasibilityLocally = (store) => {
     info,
     summary: {
       totalDepartments: departments.length,
-      totalNursesAvailable: nurses.length,
+      totalNursesAvailable: totalShiftCapacityAllNurses,
       totalNursesPerShift,
       totalDoctorsPerShift,
       totalNurseShiftsNeeded,
@@ -262,6 +493,8 @@ const checkFeasibilityLocally = (store) => {
       duration,
       estimatedNursesNeeded: totalNursesNeeded,
       estimatedDoctorsNeeded: totalDoctorsNeeded,
+      nursesPerDay: nursesPerDaySummary,
+      nursesPerShift: nursesPerShiftType,
     },
   };
 };
@@ -277,19 +510,6 @@ export const useLocalFeasibilityCheck = () => {
   const selectedRestPattern = useHospitalConfigStore((state) => state.selectedRestPattern);
   const departments = useHospitalConfigStore((state) => state.departments);
   const nurses = useHospitalConfigStore((state) => state.nurses);
-
-  console.log('useLocalFeasibilityCheck values:', {
-    selectedShiftModel,
-    shiftsPerNursePerWeek,
-    restDaysPerNurse,
-    scheduleLengthWeeks,
-    dailyShiftSlots,
-    maxConsecutiveShifts,
-    minRestHours,
-    selectedRestPattern,
-    departments,
-    nurses,
-  });
 
   const result = checkFeasibilityLocally({
     selectedShiftModel,

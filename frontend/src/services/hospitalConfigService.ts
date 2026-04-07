@@ -79,9 +79,9 @@ export const hospitalConfigService = {
         { name: "General Ward", nursesPerShift: 3, doctorsPerShift: 1 },
       ],
       nurses: project.nurses || [
-        { name: "Nurse 1", maxShiftsPerWeek: 3, shiftPreference: "day", availableDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] },
-        { name: "Nurse 2", maxShiftsPerWeek: 3, shiftPreference: "day", availableDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] },
-        { name: "Nurse 3", maxShiftsPerWeek: 3, shiftPreference: "day", availableDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] },
+        { name: "Nurse 1", maxShiftsPerWeek: 3, shiftPreference: "day", availableDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], availableStartTime: "", availableEndTime: "" },
+        { name: "Nurse 2", maxShiftsPerWeek: 3, shiftPreference: "day", availableDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], availableStartTime: "", availableEndTime: "" },
+        { name: "Nurse 3", maxShiftsPerWeek: 3, shiftPreference: "day", availableDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], availableStartTime: "", availableEndTime: "" },
       ],
       restDaysPerNurse: project.restDays ?? config?.restDays ?? (7 - (project.shiftPerWeek || 3)),
       maxConsecutiveShifts: project.maxConsecutiveShifts ?? config?.maxConsecutiveShifts ?? (project.shiftPerWeek || 3),

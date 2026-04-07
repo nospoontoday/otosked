@@ -26,9 +26,9 @@ export const useHospitalConfigStore = create((set, get) => ({
   ],
 
   nurses: [
-    { name: "Nurse 1", maxShiftsPerWeek: 3, shiftPreference: "day", availableDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] },
-    { name: "Nurse 2", maxShiftsPerWeek: 3, shiftPreference: "day", availableDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] },
-    { name: "Nurse 3", maxShiftsPerWeek: 3, shiftPreference: "day", availableDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] },
+    { name: "Nurse 1", maxShiftsPerWeek: 3, shiftPreference: "day", availableDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], availableStartTime: "", availableEndTime: "" },
+    { name: "Nurse 2", maxShiftsPerWeek: 3, shiftPreference: "day", availableDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], availableStartTime: "", availableEndTime: "" },
+    { name: "Nurse 3", maxShiftsPerWeek: 3, shiftPreference: "day", availableDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], availableStartTime: "", availableEndTime: "" },
   ],
 
   addDepartment: () =>
@@ -55,7 +55,7 @@ export const useHospitalConfigStore = create((set, get) => ({
     set((state) => ({
       nurses: [
         ...state.nurses,
-        { name: "", maxShiftsPerWeek: 3, shiftPreference: "day", availableDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] },
+        { name: `Nurse ${state.nurses.length + 1}`, maxShiftsPerWeek: 3, shiftPreference: "day", availableDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], availableStartTime: "", availableEndTime: "" },
       ],
     })),
 

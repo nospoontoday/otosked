@@ -163,6 +163,8 @@ const nurseSchema = new mongoose.Schema({
     maxShiftsPerWeek: { type: Number, default: 3 },
     shiftPreference: { type: String, enum: ['day', 'night'], default: 'day' },
     availableDays: { type: [String], default: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] },
+    availableStartTime: { type: String, default: '' },
+    availableEndTime: { type: String, default: '' },
 }, { _id: false });
 
 const templateSchema = new mongoose.Schema({
@@ -181,9 +183,9 @@ const templateSchema = new mongoose.Schema({
     nurses: {
         type: [nurseSchema],
         default: [
-            { name: 'Nurse 1', maxShiftsPerWeek: 3, shiftPreference: 'day', availableDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] },
-            { name: 'Nurse 2', maxShiftsPerWeek: 3, shiftPreference: 'day', availableDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] },
-            { name: 'Nurse 3', maxShiftsPerWeek: 3, shiftPreference: 'day', availableDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] },
+            { name: 'Nurse 1', maxShiftsPerWeek: 3, shiftPreference: 'day', availableDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], availableStartTime: '', availableEndTime: '' },
+            { name: 'Nurse 2', maxShiftsPerWeek: 3, shiftPreference: 'day', availableDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], availableStartTime: '', availableEndTime: '' },
+            { name: 'Nurse 3', maxShiftsPerWeek: 3, shiftPreference: 'day', availableDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], availableStartTime: '', availableEndTime: '' },
         ],
     },
     resourceTypes: [resourceTypeSchema],
