@@ -45,7 +45,7 @@ const FeasibilityReport = ({ feasibility }) => {
           </div>
           <div className="bg-slate-50 rounded-lg p-4">
             <p className="text-xs text-slate-500 uppercase tracking-wide">Nurses</p>
-            <p className="text-2xl font-bold text-slate-800">{summary?.totalNursesAvailable || 0}</p>
+            <p className="text-2xl font-bold text-slate-800">{summary?.totalNurses || 0}</p>
           </div>
           <div className="bg-slate-50 rounded-lg p-4">
             <p className="text-xs text-slate-500 uppercase tracking-wide">Nurses/Shift</p>
@@ -75,6 +75,101 @@ const FeasibilityReport = ({ feasibility }) => {
             </div>
           </div>
         </div>
+
+        {summary?.nursesPerDay && (
+          <div className="mt-4 p-4 bg-slate-50 rounded-lg">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-xs font-semibold text-slate-600">Nurses Available vs Needed (Per Day)</p>
+              <span className="text-[10px] text-slate-500">Need: {summary.totalNursesPerShift || 0} nurses/day</span>
+            </div>
+            <div className="grid grid-cols-7 gap-2 text-center">
+              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => {
+                const data = summary.nursesPerDay[day];
+                const needed = summary.totalNursesPerShift || 0;
+                const status = data?.nurseCount < needed 
+                  ? 'text-red-600' 
+                  : data?.nurseCount < needed + 2 
+                    ? 'text-yellow-600' 
+                    : 'text-green-600';
+                return (
+                  <div key={day} className="bg-white rounded p-2 border border-slate-200">
+                    <p className="text-[10px] text-slate-500 font-medium">{day.slice(0,3)}</p>
+                    <div className="mt-1">
+                      <p className={`text-lg font-bold ${status}`}>{data?.nurseCount || 0}</p>
+                      <p className="text-[9px] text-slate-400">avail</p>
+                    </div>
+                    <div className="mt-1 pt-1 border-t border-slate-100">
+                      <p className="text-lg font-bold text-slate-700">{needed}</p>
+                      <p className="text-[9px] text-slate-400">need</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+{summary?.nursesPerShift && Object.keys(summary.nursesPerShift).length > 0 && (
+          <div className="mt-4 p-4 bg-slate-50 rounded-lg">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-xs font-semibold text-slate-600">Shift Capacity vs Demand (Weekly)</p>
+              <span className="text-[10px] text-slate-500">Total Needed: {summary.totalNurseShiftsNeeded || 0} shifts/week</span>
+            </div>
+            
+            {/* Total Capacity - shared between all shift types */}
+            {(() => {
+              const totalCapacity = summary.totalShiftsAvailableFromNurses || 0;
+              const totalNeeded = summary.totalNurseShiftsNeeded || 0;
+              const status = totalCapacity < totalNeeded 
+                ? 'text-red-600 bg-red-50' 
+                : totalCapacity < totalNeeded + (summary.totalNursesPerShift || 0)
+                  ? 'text-yellow-600 bg-yellow-50' 
+                  : 'text-green-600 bg-green-50';
+              return (
+                <div className={`mb-4 rounded-lg p-4 border ${status.includes('red') ? 'border-red-200' : status.includes('yellow') ? 'border-yellow-200' : 'border-green-200'}`}>
+                  <p className="text-xs text-slate-500 mb-1">Total Shift Capacity (All Nurses)</p>
+                  <p className={`text-3xl font-bold ${status}`}>
+                    {totalCapacity}
+                  </p>
+                  <p className="text-[10px] text-slate-400">shifts/week available (shared by all shift types)</p>
+                  <p className="text-[10px] text-slate-400 mt-1">
+                    vs {totalNeeded} shifts/week needed
+                  </p>
+                </div>
+              );
+            })()}
+
+            <div className="grid grid-cols-2 gap-4">
+              {Object.entries(summary.nursesPerShift).map(([shiftType, data]) => {
+                const needed = (summary.totalNursesPerShift || 0) * 7;
+                const shiftCapacity = data?.shiftCapacity || 0;
+                const status = shiftCapacity < needed 
+                  ? 'text-red-600' 
+                  : shiftCapacity < needed + (summary.totalNursesPerShift || 0)
+                    ? 'text-yellow-600' 
+                    : 'text-green-600';
+                return (
+                  <div key={shiftType} className="bg-white rounded-lg p-4 border border-slate-200">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm font-semibold text-slate-700">{shiftType} Shift</p>
+                      <p className="text-xs text-slate-500">{data?.timeLabel}</p>
+                    </div>
+                    <div className="flex items-center justify-center gap-8">
+                      <div className="text-center">
+                        <p className={`text-2xl font-bold ${status}`}>{shiftCapacity}</p>
+                        <p className="text-[10px] text-slate-400">avail/wk</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-2xl font-bold text-slate-700">{needed}</p>
+                        <p className="text-[10px] text-slate-400">need/wk</p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Issues */}

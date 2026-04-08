@@ -12,7 +12,8 @@ export const checkFeasibility = (project) => {
         duration = 1,
         maxConsecutiveShifts,
         minRestHours,
-        restPattern
+        restPattern,
+        nurses = []
     } = project;
 
     // 1. Basic Configuration Validity
@@ -175,6 +176,101 @@ export const checkFeasibility = (project) => {
                 ? 'Staff will have rest days spread throughout the week'
                 : 'Staff will have rest days scheduled consecutively'
         });
+    }
+
+    // 6. Nurse Availability Checks
+    if (nurses.length === 0) {
+        issues.push({
+            type: 'error',
+            category: 'nurses',
+            message: 'No nurses defined',
+            suggestion: 'Add at least one nurse to the project'
+        });
+    } else {
+        const allDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        
+        // Check each nurse's availability
+        nurses.forEach((nurse, index) => {
+            const nurseName = nurse.name || `Nurse ${index + 1}`;
+            
+            // Check available days
+            const availableDays = nurse.availableDays || [];
+            if (availableDays.length === 0) {
+                issues.push({
+                    type: 'error',
+                    category: 'nurses',
+                    message: `${nurseName} has no available days set`,
+                    suggestion: `Set available days for ${nurseName} or use all days`
+                });
+            }
+            
+            // Check if nurse has any time restrictions
+            if (nurse.availableStartTime || nurse.availableEndTime) {
+                if (!nurse.availableStartTime || !nurse.availableEndTime) {
+                    warnings.push({
+                        type: 'warning',
+                        category: 'nurses',
+                        message: `${nurseName} has partial time availability set (only start or end time)`,
+                        suggestion: `Set both start and end time for ${nurseName} or leave both empty`
+                    });
+                }
+            }
+        });
+
+        // Calculate available nurses per day
+        const nursesPerDay = {};
+        allDays.forEach(day => {
+            nursesPerDay[day] = nurses.filter(nurse => {
+                const days = nurse.availableDays || [];
+                return days.includes(day);
+            }).length;
+        });
+
+        // Check if we have enough nurses for each day
+        const minNursesNeeded = totalNursesPerShift;
+        
+        allDays.forEach(day => {
+            const availableCount = nursesPerDay[day];
+            if (availableCount < minNursesNeeded) {
+                issues.push({
+                    type: 'error',
+                    category: 'nurses',
+                    message: `Only ${availableCount} nurse(s) available on ${day} (need ${minNursesNeeded})`,
+                    suggestion: `Add more nurses with ${day} in their availability or reduce staffing requirements`
+                });
+            } else if (availableCount < minNursesNeeded + 2) {
+                warnings.push({
+                    type: 'warning',
+                    category: 'nurses',
+                    message: `Only ${availableCount} nurse(s) available on ${day} - tight staffing`,
+                    suggestion: 'Consider adding more nurses for flexibility'
+                });
+            }
+        });
+
+        // Summary of nurse availability
+        const totalNurseCapacity = nurses.reduce((sum, n) => {
+            const days = n.availableDays || [];
+            return sum + days.length;
+        }, 0);
+        
+        const maxPossibleShifts = Math.floor(totalNurseCapacity / totalNursesPerShift);
+        
+        if (maxPossibleShifts < totalNurseShiftsNeeded) {
+            issues.push({
+                type: 'error',
+                category: 'nurses',
+                message: `Insufficient total nurse availability: can cover ${maxPossibleShifts} shifts but need ${totalNurseShiftsNeeded}`,
+                suggestion: 'Add more nurses or expand their available days'
+            });
+        } else {
+            info.push({
+                type: 'info',
+                category: 'nurses',
+                message: `Nurse availability: ${nurses.length} nurse(s) with combined capacity of ${maxPossibleShifts} shifts/week`,
+                suggestion: `Capacity is sufficient for ${totalNurseShiftsNeeded} required shifts`
+            });
+        }
     }
 
     // Determine overall status

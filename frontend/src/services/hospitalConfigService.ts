@@ -1,11 +1,10 @@
-type ShiftConfig = {
-  shiftModel: string;
-  timeSlots: string[];
-  nursesNeeded: number;
-  maxConsecutiveShifts: number;
-  minRestHours: number;
-  maxNightShiftsPerPeriod: number;
-};
+import {
+  DEFAULT_DEPARTMENTS,
+  DEFAULT_NURSES,
+  createNurse,
+  type ShiftConfig,
+  type Project,
+} from '../constants/hospitalConfigDefaults';
 
 export const hospitalConfigService = {
   getShiftDefaults(
@@ -55,7 +54,7 @@ export const hospitalConfigService = {
     return Math.ceil(totalShifts / shiftsPerWeek);
   },
 
-  mapProjectToState(project: any) {
+  mapProjectToState(project: Project) {
     const shiftModel =
       project.shiftModel || project.template.defaultShiftModel;
 
@@ -66,25 +65,23 @@ export const hospitalConfigService = {
       (c: ShiftConfig) => c.shiftModel === shiftModel
     );
 
+    const shiftsPerWeek = project.shiftPerWeek || 3;
+
     return {
       selectedShiftModel: shiftModel,
       selectedRestPattern: restPattern,
-      shiftsPerNursePerWeek: project.shiftPerWeek || 3,
+      shiftsPerNursePerWeek: shiftsPerWeek,
       scheduleLengthWeeks: project.duration || project.template.duration || 1,
       dailyShiftSlots: project.timeSlots || config?.timeSlots || [],
       availableShiftModels: project.template.shiftConfigs,
-      departments: project.departments || [
-        { name: "ICU", nursesPerShift: 1, doctorsPerShift: 1 },
-        { name: "ER", nursesPerShift: 2, doctorsPerShift: 1 },
-        { name: "General Ward", nursesPerShift: 3, doctorsPerShift: 1 },
-      ],
-      nurses: project.nurses || [
-        { name: "Nurse 1", maxShiftsPerWeek: 3, shiftPreference: "day", availableDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] },
-        { name: "Nurse 2", maxShiftsPerWeek: 3, shiftPreference: "day", availableDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] },
-        { name: "Nurse 3", maxShiftsPerWeek: 3, shiftPreference: "day", availableDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] },
-      ],
-      restDaysPerNurse: project.restDays ?? config?.restDays ?? (7 - (project.shiftPerWeek || 3)),
-      maxConsecutiveShifts: project.maxConsecutiveShifts ?? config?.maxConsecutiveShifts ?? (project.shiftPerWeek || 3),
+      departments: project.departments && project.departments.length > 0
+        ? project.departments
+        : [...DEFAULT_DEPARTMENTS],
+      nurses: project.nurses && project.nurses.length > 0
+        ? project.nurses
+        : DEFAULT_NURSES.map((n, i) => createNurse(`Nurse ${i + 1}`)),
+      restDaysPerNurse: project.restDays ?? config?.restDays ?? (7 - shiftsPerWeek),
+      maxConsecutiveShifts: project.maxConsecutiveShifts ?? config?.maxConsecutiveShifts ?? shiftsPerWeek,
       minRestHours: project.minRestHours ?? config?.minRestHours ?? 12,
       maxNightShiftsPerPeriod: project.maxNightShiftsPerPeriod ?? config?.maxNightShiftsPerPeriod ?? 4,
     };
