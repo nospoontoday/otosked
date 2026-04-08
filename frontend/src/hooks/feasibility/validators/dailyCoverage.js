@@ -2,13 +2,31 @@ import { createError, createWarning } from '../utils/issueBuilders.js';
 
 const ALL_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
+const parseTimeToMinutes = (timeStr) => {
+  if (!timeStr) return 0;
+  const [hours, minutes] = timeStr.split(':').map(Number);
+  return hours * 60 + minutes;
+};
+
+const shiftFullyCovered = (nurse, slot) => {
+  if (!nurse.availableStartTime && !nurse.availableEndTime) return true;
+  if (!nurse.availableStartTime || !nurse.availableEndTime) return false;
+  const nurseStart = parseTimeToMinutes(nurse.availableStartTime);
+  const nurseEnd = parseTimeToMinutes(nurse.availableEndTime);
+  const slotStart = parseTimeToMinutes(slot.start);
+  const slotEnd = parseTimeToMinutes(slot.end);
+  return nurseStart <= slotStart && nurseEnd >= slotEnd;
+};
+
 /**
  * Calculates how many nurses are available and their total shift capacity for each day.
+ * Considers both day availability and hour coverage of shifts.
  *
  * @param {Nurse[]} nurses - Array of nurses
+ * @param {TimeSlot[]} timeSlots - Available shift time slots
  * @returns {{ nursesPerDay: Object.<string, {nurseCount: number, shiftCapacity: number}>, shiftsAvailablePerDay: Object.<string, number> }}
  */
-export const calculateDailyNurseAvailability = (nurses) => {
+export const calculateDailyNurseAvailability = (nurses, timeSlots = []) => {
   const nursesPerDay = {};
   const shiftsAvailablePerDay = {};
 
@@ -17,8 +35,15 @@ export const calculateDailyNurseAvailability = (nurses) => {
       const days = nurse.availableDays || [];
       return days.includes(day);
     });
-    nursesPerDay[day] = availableNurses.length;
-    shiftsAvailablePerDay[day] = availableNurses.reduce(
+
+    const nursesFullyAvailableOnDay = availableNurses.filter((nurse) => {
+      if (!timeSlots || timeSlots.length === 0) return true;
+      if (!nurse.availableStartTime && !nurse.availableEndTime) return true;
+      return timeSlots.some((slot) => shiftFullyCovered(nurse, slot));
+    });
+
+    nursesPerDay[day] = nursesFullyAvailableOnDay.length;
+    shiftsAvailablePerDay[day] = nursesFullyAvailableOnDay.reduce(
       (sum, n) => sum + (n.maxShiftsPerWeek || 3),
       0
     );

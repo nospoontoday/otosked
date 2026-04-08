@@ -73,7 +73,7 @@ export const checkFeasibilityLocally = (store) => {
     shiftPerWeek,
   });
 
-  const totalShiftsAvailableFromNurses = calculateTotalCapacity(nurses);
+  const totalShiftsAvailableFromNurses = calculateTotalCapacity(nurses, timeSlots);
   const { nursesPreferringDay, nursesPreferringNight } = calculateShiftPreferences(nurses);
 
   // Generate summary info
@@ -134,7 +134,7 @@ export const checkFeasibilityLocally = (store) => {
   }
 
   // Daily coverage validation
-  const { nursesPerDay, shiftsAvailablePerDay } = calculateDailyNurseAvailability(nurses);
+  const { nursesPerDay, shiftsAvailablePerDay } = calculateDailyNurseAvailability(nurses, timeSlots);
 
   const dailyCoverageResult = validateDailyCoverage({
     nurses,
@@ -147,7 +147,7 @@ export const checkFeasibilityLocally = (store) => {
   warnings.push(...dailyCoverageResult.warnings);
 
   // Summary of nurse capacity
-  const totalShiftCapacityAllNurses = calculateAvailableCapacity(nurses);
+  const totalShiftCapacityAllNurses = calculateAvailableCapacity(nurses, timeSlots);
   const maxPossibleShifts = totalShiftCapacityAllNurses;
 
   if (maxPossibleShifts < totalNurseShiftsNeeded && totalNursesPerShift > 0) {

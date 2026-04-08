@@ -1,29 +1,84 @@
 /**
+ * Parses a time string "HH:MM" to minutes since midnight.
+ * @param {string} timeStr - Time string in HH:MM format
+ * @returns {number} Minutes since midnight
+ */
+const parseTimeToMinutes = (timeStr) => {
+  if (!timeStr) return 0;
+  const [hours, minutes] = timeStr.split(':').map(Number);
+  return hours * 60 + minutes;
+};
+
+/**
+ * Checks if a nurse's availability window fully covers a shift.
+ * Handles overnight shifts (end time < start time means crosses midnight).
+ * @param {Nurse} nurse - Nurse with availability
+ * @param {TimeSlot} slot - Shift slot with start and end times
+ * @returns {boolean} True if nurse fully covers the shift
+ */
+const shiftFullyCovered = (nurse, slot) => {
+  if (!nurse.availableStartTime && !nurse.availableEndTime) return true;
+  if (!nurse.availableStartTime || !nurse.availableEndTime) return false;
+
+  const nurseStart = parseTimeToMinutes(nurse.availableStartTime);
+  const nurseEnd = parseTimeToMinutes(nurse.availableEndTime);
+  const slotStart = parseTimeToMinutes(slot.start);
+  const slotEnd = parseTimeToMinutes(slot.end);
+
+  return nurseStart <= slotStart && nurseEnd >= slotEnd;
+};
+
+/**
+ * Counts valid shifts a nurse can work based on day and hour availability.
+ * Only counts shifts where the nurse's availability fully covers the shift.
+ *
+ * @param {Nurse} nurse - Nurse object
+ * @param {TimeSlot[]} timeSlots - Available shift time slots
+ * @returns {number} Number of shifts nurse can work per week
+ */
+const countValidShiftsPerNurse = (nurse, timeSlots) => {
+  const availableDays = nurse.availableDays || [];
+  if (availableDays.length === 0) return 0;
+  if (!timeSlots || timeSlots.length === 0) return 0;
+
+  if (!nurse.availableStartTime && !nurse.availableEndTime) {
+    return availableDays.length * timeSlots.length;
+  }
+
+  const validShiftsPerDay = timeSlots.filter(
+    (slot) => slot.start && slot.end && shiftFullyCovered(nurse, slot)
+  ).length;
+  return availableDays.length * validShiftsPerDay;
+};
+
+/**
  * Calculates total available shift capacity from all nurses.
- * Each nurse's capacity is limited by their available days.
+ * Each nurse's capacity is limited by their available days and hour coverage.
  *
  * @param {Nurse[]} nurses - Array of nurses
+ * @param {TimeSlot[]} timeSlots - Available shift time slots
  * @returns {number} Total weekly shift capacity
  */
-export const calculateTotalCapacity = (nurses) => {
+export const calculateTotalCapacity = (nurses, timeSlots = []) => {
   return nurses.reduce((sum, n) => {
-    const availableDays = (n.availableDays || []).length;
-    const capacityPerNurse = Math.min(n.maxShiftsPerWeek || 3, availableDays);
+    const validShifts = countValidShiftsPerNurse(n, timeSlots);
+    const capacityPerNurse = Math.min(n.maxShiftsPerWeek || 3, validShifts);
     return sum + Math.max(0, capacityPerNurse);
   }, 0);
 };
 
 /**
- * Calculates total shift capacity considering day availability.
- * Each nurse's capacity is limited by their available days.
+ * Calculates total shift capacity considering day and hour availability.
+ * Each nurse's capacity is limited by their available days and hour coverage.
  *
  * @param {Nurse[]} nurses - Array of nurses
+ * @param {TimeSlot[]} timeSlots - Available shift time slots
  * @returns {number} Total shift capacity from nurses with availability
  */
-export const calculateAvailableCapacity = (nurses) => {
+export const calculateAvailableCapacity = (nurses, timeSlots = []) => {
   return nurses.reduce((sum, n) => {
-    const availableDays = (n.availableDays || []).length;
-    const capacityPerNurse = Math.min(n.maxShiftsPerWeek || 3, availableDays);
+    const validShifts = countValidShiftsPerNurse(n, timeSlots);
+    const capacityPerNurse = Math.min(n.maxShiftsPerWeek || 3, validShifts);
     return sum + Math.max(0, capacityPerNurse);
   }, 0);
 };
@@ -102,8 +157,8 @@ export const calculateNursesPerShiftType = ({ nurses, timeSlots }) => {
     });
 
     const shiftCapacity = availableNurses.reduce((sum, n) => {
-      const availableDays = (n.availableDays || []).length;
-      const capacityPerNurse = Math.min(n.maxShiftsPerWeek || 3, availableDays);
+      const validShifts = countValidShiftsPerNurse(n, slots);
+      const capacityPerNurse = Math.min(n.maxShiftsPerWeek || 3, validShifts);
       return sum + Math.max(0, capacityPerNurse);
     }, 0);
 

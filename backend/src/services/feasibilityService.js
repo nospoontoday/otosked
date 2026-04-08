@@ -1,3 +1,34 @@
+const parseTimeToMinutes = (timeStr) => {
+    if (!timeStr) return 0;
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    return hours * 60 + minutes;
+};
+
+const shiftFullyCovered = (nurse, slot) => {
+    if (!nurse.availableStartTime && !nurse.availableEndTime) return true;
+    if (!nurse.availableStartTime || !nurse.availableEndTime) return false;
+    const nurseStart = parseTimeToMinutes(nurse.availableStartTime);
+    const nurseEnd = parseTimeToMinutes(nurse.availableEndTime);
+    const slotStart = parseTimeToMinutes(slot.start);
+    const slotEnd = parseTimeToMinutes(slot.end);
+    return nurseStart <= slotStart && nurseEnd >= slotEnd;
+};
+
+const countValidShiftsPerNurse = (nurse, timeSlots) => {
+    const availableDays = nurse.availableDays || [];
+    if (availableDays.length === 0) return 0;
+    if (!timeSlots || timeSlots.length === 0) return 0;
+
+    if (!nurse.availableStartTime && !nurse.availableEndTime) {
+        return availableDays.length * timeSlots.length;
+    }
+
+    const validShiftsPerDay = timeSlots.filter(
+        (slot) => slot.start && slot.end && shiftFullyCovered(nurse, slot)
+    ).length;
+    return availableDays.length * validShiftsPerDay;
+};
+
 export const checkFeasibility = (project) => {
     const issues = [];
     const warnings = [];
@@ -250,8 +281,8 @@ export const checkFeasibility = (project) => {
 
         // Summary of nurse availability
         const totalNurseCapacity = nurses.reduce((sum, n) => {
-            const availableDays = n.availableDays?.length || 0;
-            const capacityPerNurse = Math.min(n.maxShiftsPerWeek || 3, availableDays);
+            const validShifts = countValidShiftsPerNurse(n, timeSlots);
+            const capacityPerNurse = Math.min(n.maxShiftsPerWeek || 3, validShifts);
             return sum + Math.max(0, capacityPerNurse);
         }, 0);
         
