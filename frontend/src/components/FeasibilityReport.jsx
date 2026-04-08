@@ -69,8 +69,8 @@ const FeasibilityReport = ({ feasibility }) => {
               <ul className="mt-2 space-y-1 text-indigo-700">
                 <li>• Each week needs <strong>{summary?.totalNurseShiftsNeeded || 0} nurse-shifts</strong> and <strong>{summary?.totalDoctorShiftsNeeded || 0} doctor-shifts</strong></li>
                 <li>• With {summary?.shiftPerWeek} shifts per person per week, you'll need approximately:</li>
-                <li className="ml-4">- <strong>{summary?.estimatedNursesNeeded || 0} nurses</strong> (assuming 3 shifts/week each)</li>
-                <li className="ml-4">- <strong>{summary?.estimatedDoctorsNeeded || 0} doctors</strong> (assuming 3 shifts/week each)</li>
+                <li className="ml-4">- <strong>{summary?.estimatedNursesNeeded || 0} nurses</strong></li>
+                <li className="ml-4">- <strong>{summary?.estimatedDoctorsNeeded || 0} doctors</strong></li>
               </ul>
             </div>
           </div>
@@ -113,7 +113,7 @@ const FeasibilityReport = ({ feasibility }) => {
           <div className="mt-4 p-4 bg-slate-50 rounded-lg">
             <div className="flex items-center justify-between mb-3">
               <p className="text-xs font-semibold text-slate-600">Shift Capacity vs Demand (Weekly)</p>
-              <span className="text-[10px] text-slate-500">Total Needed: {summary.totalNurseShiftsNeeded || 0} shifts/week</span>
+              <span className="text-[10px] text-slate-500">Total Needed: {summary.totalNurseShiftsNeeded || 0} nurse-shifts/week</span>
             </div>
             
             {/* Total Capacity - shared between all shift types */}

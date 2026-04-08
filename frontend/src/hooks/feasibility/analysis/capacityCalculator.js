@@ -1,25 +1,30 @@
 /**
  * Calculates total available shift capacity from all nurses.
- * Sums up each nurse's maxShiftsPerWeek (defaulting to 3).
+ * Each nurse's capacity is limited by their available days.
  *
  * @param {Nurse[]} nurses - Array of nurses
  * @returns {number} Total weekly shift capacity
  */
 export const calculateTotalCapacity = (nurses) => {
-  return nurses.reduce((sum, n) => sum + (n.maxShiftsPerWeek || 3), 0);
+  return nurses.reduce((sum, n) => {
+    const availableDays = (n.availableDays || []).length;
+    const capacityPerNurse = Math.min(n.maxShiftsPerWeek || 3, availableDays);
+    return sum + Math.max(0, capacityPerNurse);
+  }, 0);
 };
 
 /**
  * Calculates total shift capacity considering day availability.
- * Only counts nurses who have at least one available day.
+ * Each nurse's capacity is limited by their available days.
  *
  * @param {Nurse[]} nurses - Array of nurses
  * @returns {number} Total shift capacity from nurses with availability
  */
 export const calculateAvailableCapacity = (nurses) => {
   return nurses.reduce((sum, n) => {
-    const days = n.availableDays || [];
-    return sum + (days.length > 0 ? n.maxShiftsPerWeek || 3 : 0);
+    const availableDays = (n.availableDays || []).length;
+    const capacityPerNurse = Math.min(n.maxShiftsPerWeek || 3, availableDays);
+    return sum + Math.max(0, capacityPerNurse);
   }, 0);
 };
 
@@ -96,10 +101,11 @@ export const calculateNursesPerShiftType = ({ nurses, timeSlots }) => {
       return false;
     });
 
-    const shiftCapacity = availableNurses.reduce(
-      (sum, n) => sum + (n.maxShiftsPerWeek || 3),
-      0
-    );
+    const shiftCapacity = availableNurses.reduce((sum, n) => {
+      const availableDays = (n.availableDays || []).length;
+      const capacityPerNurse = Math.min(n.maxShiftsPerWeek || 3, availableDays);
+      return sum + Math.max(0, capacityPerNurse);
+    }, 0);
 
     nursesPerShiftType[shiftType] = {
       type: shiftType,

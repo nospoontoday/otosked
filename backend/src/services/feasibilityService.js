@@ -156,7 +156,7 @@ export const checkFeasibility = (project) => {
         type: 'info',
         category: 'summary',
         message: `Weekly requirement: ${totalNurseShiftsNeeded} nurse-shifts and ${totalDoctorShiftsNeeded} doctor-shifts`,
-        suggestion: `Plan to have approximately ${totalNursesNeeded} nurses and ${totalDoctorsNeeded} doctors (assuming 3 shifts/week each)`
+        suggestion: `Plan to have approximately ${totalNursesNeeded} nurses and ${totalDoctorsNeeded} doctors`
     });
 
     info.push({
@@ -250,8 +250,9 @@ export const checkFeasibility = (project) => {
 
         // Summary of nurse availability
         const totalNurseCapacity = nurses.reduce((sum, n) => {
-            const days = n.availableDays || [];
-            return sum + days.length;
+            const availableDays = n.availableDays?.length || 0;
+            const capacityPerNurse = Math.min(n.maxShiftsPerWeek || 3, availableDays);
+            return sum + Math.max(0, capacityPerNurse);
         }, 0);
         
         const maxPossibleShifts = Math.floor(totalNurseCapacity / totalNursesPerShift);
