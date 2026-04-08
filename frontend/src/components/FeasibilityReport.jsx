@@ -113,13 +113,13 @@ const FeasibilityReport = ({ feasibility }) => {
           <div className="mt-4 p-4 bg-slate-50 rounded-lg">
             <div className="flex items-center justify-between mb-3">
               <p className="text-xs font-semibold text-slate-600">Shift Capacity vs Demand (Weekly)</p>
-              <span className="text-[10px] text-slate-500">Total Needed: {(summary.totalNursesPerShift || 0) * 7 * 2} shifts/week</span>
+              <span className="text-[10px] text-slate-500">Total Needed: {summary.totalNurseShiftsNeeded || 0} shifts/week</span>
             </div>
             
             {/* Total Capacity - shared between all shift types */}
             {(() => {
               const totalCapacity = summary.totalShiftsAvailableFromNurses || 0;
-              const totalNeeded = (summary.totalNursesPerShift || 0) * 7 * 2;
+              const totalNeeded = summary.totalNurseShiftsNeeded || 0;
               const status = totalCapacity < totalNeeded 
                 ? 'text-red-600 bg-red-50' 
                 : totalCapacity < totalNeeded + (summary.totalNursesPerShift || 0)
