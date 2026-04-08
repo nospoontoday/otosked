@@ -45,7 +45,7 @@ const FeasibilityReport = ({ feasibility }) => {
           </div>
           <div className="bg-slate-50 rounded-lg p-4">
             <p className="text-xs text-slate-500 uppercase tracking-wide">Nurses</p>
-            <p className="text-2xl font-bold text-slate-800">{summary?.totalNursesAvailable || 0}</p>
+            <p className="text-2xl font-bold text-slate-800">{summary?.totalNurses || 0}</p>
           </div>
           <div className="bg-slate-50 rounded-lg p-4">
             <p className="text-xs text-slate-500 uppercase tracking-wide">Nurses/Shift</p>
@@ -118,7 +118,7 @@ const FeasibilityReport = ({ feasibility }) => {
             
             {/* Total Capacity - shared between all shift types */}
             {(() => {
-              const totalCapacity = (summary.totalNursesAvailable || 0) * (summary.shiftsPerNursePerWeek || 3);
+              const totalCapacity = summary.totalShiftsAvailableFromNurses || 0;
               const totalNeeded = (summary.totalNursesPerShift || 0) * 7 * 2;
               const status = totalCapacity < totalNeeded 
                 ? 'text-red-600 bg-red-50' 

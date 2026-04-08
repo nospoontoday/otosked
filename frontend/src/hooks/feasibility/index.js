@@ -187,7 +187,7 @@ export const checkFeasibilityLocally = (store) => {
     info,
     summary: {
       totalDepartments: departments.length,
-      totalNursesAvailable: totalShiftCapacityAllNurses,
+      totalNurses: nurses.length,
       totalNursesPerShift,
       totalDoctorsPerShift,
       totalNurseShiftsNeeded,
