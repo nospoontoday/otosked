@@ -15,11 +15,8 @@ import { validateScheduleConfig } from './validators/scheduleConfig.js';
 import { validateDepartmentStaffing } from './validators/departmentStaffing.js';
 import { validateShiftDuration } from './validators/shiftDuration.js';
 import { validateRestConstraints } from './validators/restConstraints.js';
-import {
-  validateNurseAvailability,
-  calculateDailyNurseAvailability,
-} from './validators/nurseAvailability.js';
-import { validateDailyCoverage } from './validators/dailyCoverage.js';
+import { validateNurseAvailability } from './validators/nurseAvailability.js';
+import { validateDailyCoverage, calculateDailyNurseAvailability } from './validators/dailyCoverage.js';
 import { calculateStaffNeeded } from './analysis/demandCalculator.js';
 import {
   calculateTotalCapacity,

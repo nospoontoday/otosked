@@ -10,6 +10,7 @@ import { createError, createWarning } from '../utils/issueBuilders.js';
 export const validateDepartmentStaffing = (config) => {
   const { departments } = config;
   const issues = [];
+  const warnings = [];
   let totalNursesPerShift = 0;
   let totalDoctorsPerShift = 0;
 
@@ -21,7 +22,7 @@ export const validateDepartmentStaffing = (config) => {
         'Add at least one department with staffing requirements'
       )
     );
-    return { issues, totalNursesPerShift, totalDoctorsPerShift };
+    return { issues, warnings, totalNursesPerShift, totalDoctorsPerShift };
   }
 
   departments.forEach((dept, index) => {
@@ -62,7 +63,7 @@ export const validateDepartmentStaffing = (config) => {
     totalDoctorsPerShift += doctors;
 
     if (nurses > 5) {
-      issues.push(
+      warnings.push(
         createWarning(
           'workload',
           `${dept.name} has ${nurses} nurses per shift - ensure enough staff available`,
@@ -72,7 +73,7 @@ export const validateDepartmentStaffing = (config) => {
     }
 
     if (doctors > 3) {
-      issues.push(
+      warnings.push(
         createWarning(
           'workload',
           `${dept.name} has ${doctors} doctors per shift - ensure enough staff available`,
@@ -82,5 +83,5 @@ export const validateDepartmentStaffing = (config) => {
     }
   });
 
-  return { issues, totalNursesPerShift, totalDoctorsPerShift };
+  return { issues, warnings, totalNursesPerShift, totalDoctorsPerShift };
 };
