@@ -1,35 +1,44 @@
 import { create } from 'zustand';
 import { hospitalConfigService } from '../services/hospitalConfigService';
-import { hospitalConfigApi } from '../services/hospitalConfigApi';
-import { mapStateToPayload } from '../services/hospitalConfigMapper';
 import { updateProject } from '../api/projects';
+import {
+  DEFAULT_DEPARTMENTS,
+  DEFAULT_NURSES,
+  createNurse,
+  type Department,
+  type Nurse,
+  type Project,
+  type ShiftConfig,
+} from '../constants/hospitalConfigDefaults';
+
+const updateArrayItem = <T>(
+  array: T[],
+  index: number,
+  update: Partial<T>
+): T[] =>
+  array.map((item, i) => (i === index ? { ...item, ...update } : item));
+
+const filterArrayItem = <T>(array: T[], index: number): T[] =>
+  array.filter((_, i) => i !== index);
 
 export const useHospitalConfigStore = create((set, get) => ({
-  // state
-  selectedShiftModel: null,
-  selectedRestPattern: null,
+  projectId: null as string | null,
+
+  selectedShiftModel: null as string | null,
+  selectedRestPattern: null as string | null,
   shiftsPerNursePerWeek: 3,
   scheduleLengthWeeks: 1,
   restDaysPerNurse: 4,
 
-  dailyShiftSlots: [],
-  availableShiftModels: [],
+  dailyShiftSlots: [] as string[],
+  availableShiftModels: [] as ShiftConfig[],
 
   maxConsecutiveShifts: 3,
   minRestHours: 12,
   maxNightShiftsPerPeriod: 4,
 
-  departments: [
-    { name: "ICU", nursesPerShift: 1, doctorsPerShift: 1 },
-    { name: "ER", nursesPerShift: 2, doctorsPerShift: 1 },
-    { name: "General Ward", nursesPerShift: 3, doctorsPerShift: 1 },
-  ],
-
-  nurses: [
-    { name: "Nurse 1", maxShiftsPerWeek: 3, shiftPreference: "day", availableDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], availableStartTime: "", availableEndTime: "" },
-    { name: "Nurse 2", maxShiftsPerWeek: 3, shiftPreference: "day", availableDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], availableStartTime: "", availableEndTime: "" },
-    { name: "Nurse 3", maxShiftsPerWeek: 3, shiftPreference: "day", availableDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], availableStartTime: "", availableEndTime: "" },
-  ],
+  departments: [...DEFAULT_DEPARTMENTS] as Department[],
+  nurses: [...DEFAULT_NURSES] as Nurse[],
 
   addDepartment: () =>
     set((state) => ({
@@ -39,73 +48,62 @@ export const useHospitalConfigStore = create((set, get) => ({
       ],
     })),
 
-  removeDepartment: (index) =>
+  removeDepartment: (index: number) =>
     set((state) => ({
-      departments: state.departments.filter((_, i) => i !== index),
+      departments: filterArrayItem(state.departments, index),
     })),
 
-  updateDepartment: (index, field, value) =>
+  updateDepartment: (index: number, field: keyof Department, value: Department[keyof Department]) =>
     set((state) => ({
-      departments: state.departments.map((dept, i) =>
-        i === index ? { ...dept, [field]: value } : dept
-      ),
+      departments: updateArrayItem(state.departments, index, { [field]: value }),
     })),
 
   addNurse: () =>
     set((state) => ({
-      nurses: [
-        ...state.nurses,
-        { name: `Nurse ${state.nurses.length + 1}`, maxShiftsPerWeek: 3, shiftPreference: "day", availableDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], availableStartTime: "", availableEndTime: "" },
-      ],
+      nurses: [...state.nurses, createNurse(`Nurse ${state.nurses.length + 1}`)],
     })),
 
-  removeNurse: (index) =>
+  removeNurse: (index: number) =>
     set((state) => ({
-      nurses: state.nurses.filter((_, i) => i !== index),
+      nurses: filterArrayItem(state.nurses, index),
     })),
 
-  updateNurse: (index, field, value) =>
+  updateNurse: (index: number, field: keyof Nurse, value: Nurse[keyof Nurse]) =>
     set((state) => ({
-      nurses: state.nurses.map((nurse, i) =>
-        i === index ? { ...nurse, [field]: value } : nurse
-      ),
+      nurses: updateArrayItem(state.nurses, index, { [field]: value }),
     })),
 
   saveConfig: async () => {
     const state = get();
 
-    const payload = mapStateToPayload(state);
-
     if (!state.projectId) {
       throw new Error('projectId is required to save config');
     }
 
-    await updateProject(state.projectId, payload);
+    await updateProject(state.projectId, {
+      selectedShiftModel: state.selectedShiftModel,
+      shiftsPerNursePerWeek: state.shiftsPerNursePerWeek,
+      restDaysPerNurse: state.restDaysPerNurse,
+      scheduleLengthWeeks: state.scheduleLengthWeeks,
+      dailyShiftSlots: state.dailyShiftSlots,
+      selectedRestPattern: state.selectedRestPattern,
+      maxConsecutiveShifts: state.maxConsecutiveShifts,
+      minRestHours: state.minRestHours,
+      maxNightShiftsPerPeriod: state.maxNightShiftsPerPeriod,
+      departments: state.departments,
+      nurses: state.nurses,
+    });
   },
 
-  initializeFromProject: (project) => {
+  initializeFromProject: (project: Project) => {
     const mapped = hospitalConfigService.mapProjectToState(project);
     set({
       ...mapped,
       projectId: project._id || project.id,
-      departments: project.departments && project.departments.length > 0
-        ? project.departments
-        : [
-            { name: "ICU", nursesPerShift: 1, doctorsPerShift: 1 },
-            { name: "ER", nursesPerShift: 2, doctorsPerShift: 1 },
-            { name: "General Ward", nursesPerShift: 3, doctorsPerShift: 1 },
-          ],
-      nurses: project.nurses && project.nurses.length > 0
-        ? project.nurses
-        : [
-            { name: "Nurse 1", maxShiftsPerWeek: 3, shiftPreference: "day" },
-            { name: "Nurse 2", maxShiftsPerWeek: 3, shiftPreference: "day" },
-            { name: "Nurse 3", maxShiftsPerWeek: 3, shiftPreference: "day" },
-          ],
     });
   },
 
-  selectShiftModel: (shiftModel) => {
+  selectShiftModel: (shiftModel: string) => {
     const { availableShiftModels } = get();
 
     const defaults = hospitalConfigService.getShiftDefaults(
@@ -123,11 +121,14 @@ export const useHospitalConfigStore = create((set, get) => ({
       minRestHours: defaults.minRestHours,
       maxNightShiftsPerPeriod: defaults.maxNightShiftsPerPeriod,
       maxConsecutiveShifts: defaults.maxConsecutiveShifts,
-      nurses: get().nurses.map(nurse => ({ ...nurse, maxShiftsPerWeek: defaultShiftsPerWeek })),
+      nurses: get().nurses.map((nurse) => ({
+        ...nurse,
+        maxShiftsPerWeek: defaultShiftsPerWeek,
+      })),
     });
   },
 
-  toggleRestDaysPerNurse: (withRest) => {
+  toggleRestDaysPerNurse: (withRest: boolean) => {
     if (!withRest) {
       set({
         restDaysPerNurse: 0,
@@ -155,16 +156,16 @@ export const useHospitalConfigStore = create((set, get) => ({
     });
   },
 
-  setScheduleLengthWeeks: (duration) =>
+  setScheduleLengthWeeks: (duration: number) =>
     set({ scheduleLengthWeeks: duration }),
 
-  setDailyShiftSlots: (slots) =>
+  setDailyShiftSlots: (slots: string[]) =>
     set({ dailyShiftSlots: slots }),
 
-  selectRestPattern: (pattern) =>
+  selectRestPattern: (pattern: string) =>
     set({ selectedRestPattern: pattern }),
 
-  setShiftsPerNursePerWeek: (shifts) => {
+  setShiftsPerNursePerWeek: (shifts: number) => {
     const state = get();
 
     const computed = hospitalConfigService.computeRestSettings({
@@ -179,7 +180,10 @@ export const useHospitalConfigStore = create((set, get) => ({
       maxConsecutiveShifts: computed.maxConsecutiveShifts,
       minRestHours: computed.minRestHours,
       maxNightShiftsPerPeriod: computed.maxNightShiftsPerPeriod,
-      nurses: state.nurses.map(nurse => ({ ...nurse, maxShiftsPerWeek: shifts })),
+      nurses: state.nurses.map((nurse) => ({
+        ...nurse,
+        maxShiftsPerWeek: shifts,
+      })),
     });
   },
 
